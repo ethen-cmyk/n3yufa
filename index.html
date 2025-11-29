@@ -1,0 +1,3176 @@
+<!DOCTYPE html>
+<html lang="ja" translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <title>TRY N3 语法排序练习 V3 (标点强制移除)</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #ffffff;
+            --accent: #0ea5e9;
+            --accent-2: #22c55e;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --chip: #fbbf24;
+            --chip-hover: #f59e0b;
+        }
+        body {
+            font-family: 'Segoe UI', 'Noto Sans JP', 'Hiragino Sans', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at 20% 20%, rgba(14,165,233,0.15), transparent 25%),
+                        radial-gradient(circle at 80% 0%, rgba(34,197,94,0.15), transparent 20%),
+                        linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+            color: var(--text);
+            margin: 0;
+            padding: 24px;
+        }
+        .container {
+            max-width: 980px;
+            margin: auto;
+            background: var(--card);
+            padding: 32px;
+            border-radius: 14px;
+            box-shadow: 0 10px 40px rgba(15, 23, 42, 0.12);
+        }
+        h1 {
+            color: var(--accent);
+            text-align: center;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid rgba(14, 165, 233, 0.25);
+            letter-spacing: 0.5px;
+        }
+        .grammar-info {
+            background: linear-gradient(90deg, rgba(14,165,233,0.08), rgba(34,197,94,0.08));
+            border-left: 5px solid var(--accent);
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            border-radius: 10px;
+        }
+        .grammar-info p { margin: 6px 0; }
+        .hint-text {
+            margin: 4px 0 18px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+        #question-area { margin-bottom: 18px; }
+        #shuffled-sentence {
+            display: flex; flex-wrap: wrap; gap: 10px;
+            padding: 16px;
+            border: 1px dashed #cbd5e1;
+            min-height: 68px;
+            background-color: #f8fafc;
+            border-radius: 10px;
+        }
+        .word-chip {
+            background-color: var(--chip);
+            color: #2a2a2a;
+            padding: 10px 16px;
+            border-radius: 22px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.1s, background-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+        }
+        .word-chip:hover { background-color: var(--chip-hover); transform: translateY(-1px); box-shadow: 0 5px 12px rgba(0,0,0,0.15); }
+        #answer-area {
+            display: flex; flex-wrap: wrap; gap: 10px;
+            padding: 16px;
+            border: 1px solid rgba(34,197,94,0.5);
+            min-height: 68px;
+            background-color: #ecfdf3;
+            border-radius: 10px;
+        }
+        .answer-chip {
+            background-color: var(--accent-2);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 22px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 3px 10px rgba(34,197,94,0.25);
+        }
+        .answer-chip:hover { background-color: #16a34a; }
+        .button-group { text-align: center; margin-top: 20px; }
+        button {
+            padding: 10px 20px;
+            font-size: 15px;
+            margin: 0 8px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.25s, transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+        #check-button { background: linear-gradient(135deg, #0ea5e9, #38bdf8); color: white; }
+        #check-button:hover { transform: translateY(-1px); }
+        #next-button { background: #475569; color: white; }
+        #next-button:hover { background: #334155; transform: translateY(-1px); }
+        #reset-button { background: #f43f5e; color: white; }
+        #reset-button:hover { background: #e11d48; transform: translateY(-1px); }
+        #progress-reset-button { background-color: #fde68a; color: #2a2a2a; }
+        #progress-reset-button:hover { background-color: #fcd34d; transform: translateY(-1px); }
+        #result-area {
+            margin-top: 18px;
+            padding: 16px;
+            border-radius: 10px;
+            background-color: #fef2f2;
+            color: #991b1b;
+            display: none;
+        }
+        .correct { background-color: #d1fae5 !important; color: #065f46 !important; }
+        .result-sentence { margin-top: 8px; font-size: 1.05em; font-weight: bold; line-height: 1.6; }
+        .correct-sentence { color: #16a34a; }
+        .translation { color: #0ea5e9; font-style: italic; margin-top: 4px; }
+        .progress-container { margin: 10px 0 20px; }
+        .progress-text { font-weight: bold; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; color: var(--muted); }
+        .progress-bar-wrap { width: 100%; height: 10px; background: #e2e8f0; border-radius: 6px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #22c55e, #0ea5e9); width: 0%; transition: width 0.2s ease; }
+    </style>
+</head>
+<body class="notranslate">
+
+<div class="container">
+    <h1>📝 TRY N3 语法排序练习 (共113条)</h1>
+    <div class="progress-container">
+        <div class="progress-text">
+            <span>练习进度</span>
+            <span id="progress-label">0/0</span>
+        </div>
+        <div class="progress-bar-wrap">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+    </div>
+    <p style="color:#28a745; font-weight: bold;">**V3 最终优化版：已强制移除句末标点，并改进分词逻辑**</p>
+
+    <div class="grammar-info">
+        <p><strong>当前语法点:</strong> <span id="current-grammar"></span></p>
+        <p><strong>题目:</strong> <span id="question-number">1</span></p>
+        <p><strong>参考翻译:</strong> <span id="translation-hint"></span></p>
+        <p><strong>错题数:</strong> <span id="wrong-count">0</span></p>
+        <p><strong>模式:</strong> <span id="mode-label">全题模式</span></p>
+    </div>
+    <p class="hint-text">按翻译提示排序，双击词块可听发音，点击即可移动词块。</p>
+
+    <div id="question-area">
+        <h3>打乱的词块（点击下方词块即可将其移到作答区）:</h3>
+        <div id="shuffled-sentence"></div>
+        
+        <h3>作答区（点击作答区的词块可将其回上方）:</h3>
+        <div id="answer-area"></div>
+    </div>
+
+    <div class="button-group">
+        <button id="check-button">✅ 检查答案</button>
+        <button id="reset-button">🔄 重置句子</button>
+        <button id="next-button">➡️ 下一题</button>
+        <button id="wrong-mode-button" style="background-color:#c084fc;color:#fff;">错题重练</button>
+        <button id="all-mode-button" style="background-color:#94a3b8;color:#fff;">返回全题</button>
+        <button id="progress-reset-button" style="background-color:#ffc107;color:#333;">重置进度</button>
+    </div>
+
+    <div id="result-area">
+        <p id="result-message"></p>
+        <div id="correct-display">
+            <p><strong>正确句子:</strong> <span class="result-sentence correct-sentence" id="correct-japanese"></span></p>
+            <p><strong>中文翻译:</strong> <span class="result-sentence translation" id="correct-chinese"></span></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- 1. 语法数据（113条） ---
+    // (数据保持不变)
+    const grammarData = [
+    {
+        "grammar": "V ます＋始める",
+        "sentence": "日本語を習い始めたのは半年前です。",
+        "translation": "开始学日语是半年前。"
+    },
+    {
+        "grammar": "V ます＋始める",
+        "sentence": "桜の花が咲き始めましたね。",
+        "translation": "樱花开始盛开了。"
+    },
+    {
+        "grammar": "V ます＋始める",
+        "sentence": "その本、読み終わったら貸してもらえませんか。",
+        "translation": "那本书你读完以后能借给我吗？"
+    },
+    {
+        "grammar": "V ます＋始める",
+        "sentence": "晩ご飯を食べ終わってから、みんなでゲームをした。",
+        "translation": "吃完晚饭以后，大家一起玩游戏。"
+    },
+    {
+        "grammar": "V ます＋始める",
+        "sentence": "V ます+終わる",
+        "translation": "意味：用于明确指出某事要结束时。"
+    },
+    {
+        "grammar": "～ように言う",
+        "sentence": "先生に宿題を忘れないように注意された。",
+        "translation": "被老师警告不要忘记做作业。"
+    },
+    {
+        "grammar": "～ように言う",
+        "sentence": "医者にお酒を飲まないように言われました。",
+        "translation": "被医生要求不要喝酒。"
+    },
+    {
+        "grammar": "～ように言う",
+        "sentence": "お母さんからも勉強するように言ってください。",
+        "translation": "妈妈也跟他说说，要努力学习。"
+    },
+    {
+        "grammar": "～ように言う",
+        "sentence": "私は佐藤さんに、会議の前に資料をコピーしておくように頼みました。",
+        "translation": "我拜托佐藤在会议前把资料复印好。"
+    },
+    {
+        "grammar": "～ように言う",
+        "sentence": "先生は宿題を忘れないように言いました。",
+        "translation": "老师叮嘱不要忘记作业。"
+    },
+    {
+        "grammar": "～という",
+        "sentence": "彼が有名な音楽家だということはあまり知られていない。",
+        "translation": "他是一位著名的音乐家这件事鲜为人知。"
+    },
+    {
+        "grammar": "～という",
+        "sentence": "最近は大学を卒業しても就職が難しいという話を聞きました。",
+        "translation": "听说最近大学毕业也很难就业。"
+    },
+    {
+        "grammar": "～という",
+        "sentence": "背が伸びるということは、骨が伸びるということです。",
+        "translation": "所谓个子长高就是骨头长高。"
+    },
+    {
+        "grammar": "～という",
+        "sentence": "画面に「圏外」という文字が出たら、今電波が届かないところにいるという",
+        "translation": "如果画面上出现“圈外”这个两个字的话，就表示现在在信号无法到达的地方。"
+    },
+    {
+        "grammar": "～だろうと言う",
+        "sentence": "たぶんこの雨は1時間ぐらいでやむだろうと思います。",
+        "translation": "我想这场雨大概一个小时左右就会停。"
+    },
+    {
+        "grammar": "～だろうと言う",
+        "sentence": "外国で一人暮らしをするのはきっとさびしいだろうと思う。",
+        "translation": "我想在外国一个人生活一定很寂寞吧。"
+    },
+    {
+        "grammar": "～だろうと言う",
+        "sentence": "沖縄は暑いだろうと思っていたが、毎日雨で寒くて泳げなかった。",
+        "translation": "我以为冲绳很热，但是每天都下雨，冷得不能游泳。"
+    },
+    {
+        "grammar": "～だろうと言う",
+        "sentence": "天気予報では明日は雨だろうと言っています。",
+        "translation": "天气预报说明天大概会下雨。"
+    },
+    {
+        "grammar": "～なさそうだ",
+        "sentence": "このカレーはあまり辛くなさそうですね。",
+        "translation": "这个咖喱好像不太辣啊。"
+    },
+    {
+        "grammar": "～なさそうだ",
+        "sentence": "この仕事はそんなに大変じゃなさそうだ。",
+        "translation": "这份工作看起来没那么辛苦。"
+    },
+    {
+        "grammar": "～そうにない／そうもない",
+        "sentence": "こんな難しそうな本、1週間では読めそうもない",
+        "translation": "这本书那么难，看起来一个星期看不完"
+    },
+    {
+        "grammar": "～なさそうだ",
+        "sentence": "忙しいので、しばらく残業は減りそうもない。",
+        "translation": "因为很忙，所以暂时看起来加班不会减少。"
+    },
+    {
+        "grammar": "～そうもない／そうにない",
+        "sentence": "安くなったら買おうと思ったが、これ以上安くなりそうにないから、あきらめた。",
+        "translation": "我想便宜了就买，可是好像不能再便宜了，我不买了。"
+    },
+    {
+        "grammar": "～なさそうだ",
+        "sentence": "荷物が多くて、かばんに全部入りそうにない。",
+        "translation": "行李太多，看来不能全部塞进包里。"
+    },
+    {
+        "grammar": "V る＋と",
+        "sentence": "待ち合わせの場所に着くと、友だちはもう来ていた。",
+        "translation": "到了约定的地方，发现朋友已经来了。"
+    },
+    {
+        "grammar": "V る＋と",
+        "sentence": "昔住んでいたところに行ってみると、大きいビルが建っていた。",
+        "translation": "去了以前住的地方，发现建了一座很大的大楼。"
+    },
+    {
+        "grammar": "V る＋と",
+        "sentence": "国から届いた荷物を開けると、大好きなお菓子が入っていた。",
+        "translation": "打开从国内寄来的行李，发现里面有我最喜欢的点心。"
+    },
+    {
+        "grammar": "V る＋と",
+        "sentence": "屋上に上がったら、東京スカイツリーが見えた。",
+        "translation": "上了屋顶，看到了东京天空树。"
+    },
+    {
+        "grammar": "V る＋と",
+        "sentence": "発車のベルが鳴っているので飛び乗ったら、反対方向の電車だった。",
+        "translation": "因为发车的铃声响了，所以跳了上去，（发现）是反方向的电车。"
+    },
+    {
+        "grammar": "V る＋と",
+        "sentence": "就職試験の結果の連絡だと思って急いで電話に出たら、間違い電話だった。",
+        "translation": "我以为是通知就业考试结果的电话，急忙接了电话，结果打错了的电话。"
+    },
+    {
+        "grammar": "ほど",
+        "sentence": "富士山に登って、下りてきたときは、 もう一歩も歩けないほど疲れていた。",
+        "translation": "登上富士山，下来的时候，累得一步也走不动了。"
+    },
+    {
+        "grammar": "ほど",
+        "sentence": "あの双子は両親も間違えるほどよく似ている。",
+        "translation": "那对双胞胎长得很像，连父母都弄错啦。"
+    },
+    {
+        "grammar": "ほど",
+        "sentence": "年末は、猫の手も借りたいほど忙しくなる。",
+        "translation": "年末忙得不可开交（忙到想向小猫咪借手用）。"
+    },
+    {
+        "grammar": "ほど",
+        "sentence": "ランチタイムのレストランは、目が回るほど忙しい。",
+        "translation": "午餐时间的餐厅忙得让人晕头转向。"
+    },
+    {
+        "grammar": "ほど",
+        "sentence": "今週中にやらなければならない仕事が山ほどある。",
+        "translation": "这周必须要做的工作堆积如山。"
+    },
+    {
+        "grammar": "ほど",
+        "sentence": "以“～”为例，表达“……”的状态、程度非同寻常，如“步けないほど強い風(风",
+        "translation": "很大，走都走不动)”"
+    },
+    {
+        "grammar": "V ていく",
+        "sentence": "冬になると渡り鳥は南のほうへ飛んでいく。",
+        "translation": "一到冬天候鸟就向南飞去。"
+    },
+    {
+        "grammar": "V ていく",
+        "sentence": "これからも日本語の勉強を続けていくつもりです。",
+        "translation": "我打算今后继续学习日语。"
+    },
+    {
+        "grammar": "V ていく",
+        "sentence": "これから、日本の会社でも外国人社員は増えていくと思います。",
+        "translation": "我想，今后日本公司的外国员工也会越来越增多。"
+    },
+    {
+        "grammar": "V ていく",
+        "sentence": "申し込みのときに、身分証明書を持ってきてください。",
+        "translation": "报名时请带上身份证。"
+    },
+    {
+        "grammar": "V ていく",
+        "sentence": "棚から本が落ちてきて、おどろいた。",
+        "translation": "书从架子上掉下来，吓了一跳。"
+    },
+    {
+        "grammar": "V ていく",
+        "sentence": "日本人は昔から魚を食べてきました。",
+        "translation": "日本人自古以来就吃鱼。"
+    },
+    {
+        "grammar": "V ていく",
+        "sentence": "私はこの町で4年間、環境調査を続けてきました。",
+        "translation": "我在这座小镇连续四年进行环境调查。"
+    },
+    {
+        "grammar": "V ます＋続ける",
+        "sentence": "あの人は歯医者に1年以上通い続けているそうです。",
+        "translation": "听说那个人连续去看牙医一年多了。"
+    },
+    {
+        "grammar": "V ます＋続ける",
+        "sentence": "犬のハチ公は、主人の帰りを待ち続けた。",
+        "translation": "小狗八公一直等着主人回来。"
+    },
+    {
+        "grammar": "V ます＋続ける",
+        "sentence": "この薬は途中でやめないで、 1週間飲み続けてください。",
+        "translation": "这个药不要半途而废，请坚持吃一个星期。"
+    },
+    {
+        "grammar": "～なら",
+        "sentence": "台湾へ旅行に行くなら、11月がいちばんいいと思いますよ。",
+        "translation": "如果去台湾旅行的话，我觉得11月最好。"
+    },
+    {
+        "grammar": "～なら",
+        "sentence": "N3に合格したいなら、この本をよく勉強したほうがいいよ。",
+        "translation": "如果你想考上N3，你最好好好学习这本书。"
+    },
+    {
+        "grammar": "～なら",
+        "sentence": "雨なら外出をやめたほうがいい。",
+        "translation": "如果下雨，最好别出门。"
+    },
+    {
+        "grammar": "～って",
+        "sentence": "さっき、上田さんって人が訪ねてきましたよ。お知り合いですか。",
+        "translation": "刚才有个叫上田的人来过，你认识吗？"
+    },
+    {
+        "grammar": "～って",
+        "sentence": "花粉症って病気、アレルギーが原因なんだよね。",
+        "translation": "花粉症这种疾病，过敏是原因吧。"
+    },
+    {
+        "grammar": "～てもらう・てくれる",
+        "sentence": "この会社は自分の意見を自由に言わせてくれる。",
+        "translation": "这家公司允许我们自由发表自己的意见。"
+    },
+    {
+        "grammar": "～てもらう・てくれる",
+        "sentence": "高校生のとき、アルバイトをしたいと父に言ったが、させてもらえなかった。",
+        "translation": "高中的时候，我对父亲说想打工，但是没得到允许。"
+    },
+    {
+        "grammar": "～てもらう・てくれる",
+        "sentence": "上司は何事も経験だと言って、私を海外研修に行かせてくれた。",
+        "translation": "上司说什么事都是经验，让我去海外研修。"
+    },
+    {
+        "grammar": "～てもらう・てくれる",
+        "sentence": "ここに荷物を置かせてもらってもいいですか。",
+        "translation": "可以让我把行李放在这里吗？"
+    },
+    {
+        "grammar": "～させられる",
+        "sentence": "子どものときテストの成績が悪いと、父にトイレそうじをさせられた。",
+        "translation": "小时候考试成绩不好，父亲让我打扫厕所。"
+    },
+    {
+        "grammar": "～させられる",
+        "sentence": "中学生のとき、先生にグラウンドを何周も走らされた。",
+        "translation": "初中的时候，老师让我在操场上跑了好几圈。"
+    },
+    {
+        "grammar": "～させられる",
+        "sentence": "学生のとき、いつも先輩に飲み物を買いに行かされた。",
+        "translation": "学生时代，经常被前辈逼着去买饮料。"
+    },
+    {
+        "grammar": "～させられる",
+        "sentence": "V-る",
+        "translation": "使役形式 使役被动形式"
+    },
+    {
+        "grammar": "～させられる",
+        "sentence": "来る 来させる 来させられる",
+        "translation": "三类动词"
+    },
+    {
+        "grammar": "～がる",
+        "sentence": "彼は試合に負けてくやしがっている。",
+        "translation": "他因比赛输了而懊恼。"
+    },
+    {
+        "grammar": "～がる",
+        "sentence": "わからない言葉があったら、面倒がらないですぐに調べなさい。",
+        "translation": "如果有不懂的词，不要嫌麻烦，请马上查一下。"
+    },
+    {
+        "grammar": "～がる",
+        "sentence": "妹は車をほしがっているが、父は絶対許さないと言っている。",
+        "translation": "妹妹想要车，但是父亲说绝对不允许。"
+    },
+    {
+        "grammar": "～がる",
+        "sentence": "田中さんは人気スターのファッションを何でも真似したがる。",
+        "translation": "只要是人气明星的时尚搭配，无论是什么田中都想模仿。"
+    },
+    {
+        "grammar": "～がる",
+        "sentence": "寒い日は猫も外へ出たがらない。",
+        "translation": "天气冷的时候，连猫也不想出去。"
+    },
+    {
+        "grammar": "V たとたん（に）",
+        "sentence": "立ち上がったとたん、目の前が暗くなった。",
+        "translation": "刚一站起来，立马眼前一黑。"
+    },
+    {
+        "grammar": "V たとたん（に）",
+        "sentence": "彼女はさっきまで元気がなかったのに、ご飯を食べたとたん元気になった。",
+        "translation": "她刚才还没有精神，刚吃完饭就精神了。"
+    },
+    {
+        "grammar": "V たとたん（に）",
+        "sentence": "彼は、相手が社長だと知ったとたん、急にていねいに話し始めた。",
+        "translation": "他一知道对方是社长，就突然开始恭恭敬敬地说起来。"
+    },
+    {
+        "grammar": "V ます＋出す",
+        "sentence": "さっきまで笑っていた赤ちゃんが急に泣き出した。",
+        "translation": "刚才还在笑的婴儿突然哭了起来。"
+    },
+    {
+        "grammar": "V ます＋出す",
+        "sentence": "突然大雨が降り出し、人々はあわてて建物の中に入った。",
+        "translation": "突然下起了大雨，人们慌慌张张地走进了建筑物。"
+    },
+    {
+        "grammar": "V ます＋出す",
+        "sentence": "彼は短気で急に怒り出すから、付き合いにくい。",
+        "translation": "他脾气很急，冷不丁就发火，很难相处。"
+    },
+    {
+        "grammar": "V よう（V 意向形）＋とする",
+        "sentence": "小さい子どもが道を渡ろうとしているよ。一人でどこへ行くのかな。",
+        "translation": "有个小孩子正要过马路，他一个人要去哪里呢？"
+    },
+    {
+        "grammar": "V よう（V 意向形）＋とする",
+        "sentence": "生まれたばかりの馬の赤ちゃんが、一生けんめい立とうとしている。",
+        "translation": "刚出生的小马，正在拼命努力站起来。"
+    },
+    {
+        "grammar": "V よう（V 意向形）＋とする",
+        "sentence": "昔の友だちの名前を思い出そうとしたが、どうしても思い出せない。",
+        "translation": "我努力地想记起以前朋友的名字，但怎么也想不起来。"
+    },
+    {
+        "grammar": "V よう（V 意向形）＋とする",
+        "sentence": "リンさんは試験が近いのに、ぜんぜん勉強しようとしない。",
+        "translation": "考试将近，却小林一点也不想学习。"
+    },
+    {
+        "grammar": "V よう（V 意向形）＋とする",
+        "sentence": "ドアを開けようとしたが、開かなかった。",
+        "translation": "想去开门，但没打开。"
+    },
+    {
+        "grammar": "こともある",
+        "sentence": "この地方では4月でも雪が降ることがある。",
+        "translation": "这个地方4月有时也会下雪。"
+    },
+    {
+        "grammar": "こともある",
+        "sentence": "私の大学は横浜にもキャンパスがあって、ときどきそちらに行かなければならな",
+        "translation": "我的大学在横滨也有校园，有时必须去那里。"
+    },
+    {
+        "grammar": "こともある",
+        "sentence": "ふだんはよく寝られるんですが、ストレスがたまって眠れないこともあります。",
+        "translation": "平时睡得很好，但也有因压力过大而睡不着的情况。"
+    },
+    {
+        "grammar": "こともある",
+        "sentence": "あの店の営業時間は5時までですが、昼過ぎに全部売れてしまうこともあります。",
+        "translation": "那家店的营业时间是到5点，但有时过了中午就会全部卖光。"
+    },
+    {
+        "grammar": "～ておく",
+        "sentence": "①夏に車の中で子どもを待たせておくのは危険ですよ。",
+        "translation": "①夏天让孩子在车里等是很危险的。"
+    },
+    {
+        "grammar": "～ておく",
+        "sentence": "②家事をしている間、子どもをおもちゃで遊ばせておく。",
+        "translation": "②我做家务的时候，会让孩子玩玩具。"
+    },
+    {
+        "grammar": "～ておく",
+        "sentence": "した。",
+        "translation": "③儿子说什么都不听，所以决定让他随便做自己想做的事。"
+    },
+    {
+        "grammar": "～られてしまう",
+        "sentence": "片思いの彼を映画に誘ったが、断られてしまった。",
+        "translation": "邀请单恋的他去看电影，结果被拒绝了。"
+    },
+    {
+        "grammar": "～られてしまう",
+        "sentence": "あとで食べようと思っていたケーキを妹に食べられてしまった。",
+        "translation": "原想等会儿再吃的蛋糕被妹妹吃掉了。"
+    },
+    {
+        "grammar": "～られてしまう",
+        "sentence": "ハイキングをしていたら、はちに刺されてしまった。",
+        "translation": "徒步旅行的时候，被蜜蜂蜇了。"
+    },
+    {
+        "grammar": "～られてしまう",
+        "sentence": "言葉が足りないと、誤解されてしまうことがある。",
+        "translation": "如果语言表达不充分，有时会被误解。"
+    },
+    {
+        "grammar": "～による",
+        "sentence": "大学はアンケートによる満足度調査の結果を発表した。",
+        "translation": "大学公布了问卷调查的满意度调查结果。"
+    },
+    {
+        "grammar": "～による",
+        "sentence": "経営学理論の講義は試験を行わず、レポートによる評価を行う。",
+        "translation": "经营学理论课不进行考试，而是通过论文进行评价。"
+    },
+    {
+        "grammar": "～による",
+        "sentence": "オリンピックの開催地はIOCの委員の投票によって決めることになっている。",
+        "translation": "奥运会的举办地由IOC委员投票决定。"
+    },
+    {
+        "grammar": "～による",
+        "sentence": "わが社は社内の公用語を英語にすることによって国際化を目指している。",
+        "translation": "我们公司规定公司内部的通用语为英语，以此来推进国际化。"
+    },
+    {
+        "grammar": "～による",
+        "sentence": "N+による＋N",
+        "translation": "意味：表示做某事时的方式、方法。"
+    },
+    {
+        "grammar": "～に対して",
+        "sentence": "彼女はだれに対しても親切です。",
+        "translation": "她对谁都很亲切。"
+    },
+    {
+        "grammar": "～に対して",
+        "sentence": "目上の人に対しては敬語を使いましょう。",
+        "translation": "对长辈、上级要使用敬语。"
+    },
+    {
+        "grammar": "～に対して",
+        "sentence": "私費留学生に対する獎学金などの援助はまだ十分ではないと思う。",
+        "translation": "我认为对自费留学生的奖学金等援助还不够。"
+    },
+    {
+        "grammar": "～に対して",
+        "sentence": "この病気に対する効果的な治療法はまだ見つかっていない。",
+        "translation": "对这个病的有效治疗方法尚未找到。"
+    },
+    {
+        "grammar": "～に対して",
+        "sentence": "N+に対する＋N",
+        "translation": "意味：对于... ；表示当面对他人直接施加影响或者表示“温柔”“失礼”等态度。"
+    },
+    {
+        "grammar": "～ため",
+        "sentence": "雨のためにハイキングは中止になりました。",
+        "translation": "因为下雨，郊游中止了。"
+    },
+    {
+        "grammar": "～ため",
+        "sentence": "外国人観光客が増えたため、外国語のパンフレットを作ることになった。",
+        "translation": "由于外国游客增加，决定制作外语宣传册。"
+    },
+    {
+        "grammar": "～ため",
+        "sentence": "事故のため、電車が遅れております。",
+        "translation": "由于事故，电车晚点了。"
+    },
+    {
+        "grammar": "～ため",
+        "sentence": "理由: ABK大学受験のため",
+        "translation": "理由：为了准备ABK大学考试"
+    },
+    {
+        "grammar": "～ため",
+        "sentence": "【简体：なAだな/Nだの】",
+        "translation": "意味：用于想说“因为～的原因、理由”时。"
+    },
+    {
+        "grammar": "N+につき",
+        "sentence": "当スポーツクラブ会員以外の方でも、1回につき2,000円で施設をご利用いただ",
+        "translation": "本体育俱乐部会员以外的人，一次2000日元也可以使用设施。"
+    },
+    {
+        "grammar": "N+につき",
+        "sentence": "今回のチャリティコンサートは、ハガキ1枚につき2名様までお申し込みいただ",
+        "translation": "这次的慈善演唱会，凭张明信片每张最多可以申请2人。"
+    },
+    {
+        "grammar": "N+につき",
+        "sentence": "ランニングマシンは予約制で、ご利用はお1人につき30分までとなっておりま",
+        "translation": "跑步机是预约制的，每人最多30分钟。"
+    },
+    {
+        "grammar": "～とおり",
+        "sentence": "今日の映画は本当におもしろかった。友だちが言ったとおりだった。",
+        "translation": "正如朋友所说，今天的电影真有趣。"
+    },
+    {
+        "grammar": "～とおり",
+        "sentence": "初めて見た富士山は私が想像していたとおりにきれいだった。",
+        "translation": "第一次看到的富士山和我想象的一样漂亮。"
+    },
+    {
+        "grammar": "～とおり",
+        "sentence": "料理の本に書いてあるとおりに作ったら、おいしくできた。",
+        "translation": "按照料理书上写的那样做的话，做得很好吃。"
+    },
+    {
+        "grammar": "～とおり",
+        "sentence": "今日は予定どおりに仕事が進んだ。",
+        "translation": "今天工作按计划进行了。"
+    },
+    {
+        "grammar": "～とおり",
+        "sentence": "あいちゃんと純君が結婚するそうだ。やっぱり私の予想どおりだった。",
+        "translation": "听说小爱和小纯要结婚啦。果然和我预想的一样。"
+    },
+    {
+        "grammar": "～とおり",
+        "sentence": "Nの＋とおりだ・とおり（に）",
+        "translation": "意味：表示和说过的、预想的一样。"
+    },
+    {
+        "grammar": "～を通して",
+        "sentence": "現在はインターネットを通して、すぐに世界中にニュースが広まる。",
+        "translation": "现在通过网络，新闻很快就会传遍全世界。"
+    },
+    {
+        "grammar": "～を通して",
+        "sentence": "私たちは読書を通していろいろな人の考え方を知ることができます。",
+        "translation": "我们可以通过阅读了解各种各样的人的想法。"
+    },
+    {
+        "grammar": "～を通して",
+        "sentence": "取材は、弁護士を通して申し込んでください。",
+        "translation": "采访请通过律师申请。"
+    },
+    {
+        "grammar": "～を通して",
+        "sentence": "私は海外留学の経験を通じて多くのことを学んだ。",
+        "translation": "我通过出国留学的经验学到了很多东西。"
+    },
+    {
+        "grammar": "～を通して",
+        "sentence": "N＋を通じて（つうじて）",
+        "translation": "意味：通过、借助...的方法"
+    },
+    {
+        "grammar": "～のような",
+        "sentence": "インフルエンザのようなほかの人にうつる病気になったら、治るまで学校へ来て",
+        "translation": "如果得了流感之类传染给别人的病，在痊愈之前不能来学校。"
+    },
+    {
+        "grammar": "～のような",
+        "sentence": "われわれのようなプロのスポーツ選手には食事も練習と同じぐらい大切です。",
+        "translation": "对于我们这样的职业运动员来说，吃饭和练习一样重要。"
+    },
+    {
+        "grammar": "～のような",
+        "sentence": "梅雨のように雨の多い季節は洗濯物が乾かなくて困ります。",
+        "translation": "像梅雨一样的多雨的季节，洗的衣服不干，很为难。"
+    },
+    {
+        "grammar": "～のような",
+        "sentence": "退院したばかりなので、テニスのように激しいスポーツはまだできません。",
+        "translation": "刚出院，还不能进行像网球那样激烈的运动。"
+    },
+    {
+        "grammar": "～のような",
+        "sentence": "N＋のような＋N",
+        "translation": "意味：用于举出代表性的例子。"
+    },
+    {
+        "grammar": "～",
+        "sentence": "ピアノみたいに大きくて重いものがあると、引っ越しが大変だね。",
+        "translation": "如果有像钢琴一样又大又重的东西，搬家就麻烦了。"
+    },
+    {
+        "grammar": "～",
+        "sentence": "冬は沖縄みたいに暖かいところに旅行に行きたいな。",
+        "translation": "冬天想去像冲绳那样温暖的地方旅行。"
+    },
+    {
+        "grammar": "～",
+        "sentence": "最近の調査によれば、病気ではないが不健康な人が増えているそうだ。",
+        "translation": "根据最近的调查，虽然不是生病，但不健康的人在增加。"
+    },
+    {
+        "grammar": "～",
+        "sentence": "今朝の天気予報によると、今週はずっと晴れるそうだ。",
+        "translation": "据今天早上的天气预报说，这周一直是晴天。"
+    },
+    {
+        "grammar": "～",
+        "sentence": "観光ガイドブックによれば、この町では毎週日曜日に朝市が開かれるらしい。",
+        "translation": "根据观光指南，这个小镇每周日都会举办早市。"
+    },
+    {
+        "grammar": "～",
+        "sentence": "天気予報によると、明日は雪が降るそうです。",
+        "translation": "据天气预报说明天好像要下雪。"
+    },
+    {
+        "grammar": "～",
+        "sentence": "新聞によると、来月新しい地下鉄の線が開通するらしい。",
+        "translation": "据报纸说，下个月会有一条新的地铁线路开通。"
+    },
+    {
+        "grammar": "～ということだ",
+        "sentence": "ニュースでは、今年は水不足の心配はないということです。",
+        "translation": "新闻上说，今年不用担心缺水。"
+    },
+    {
+        "grammar": "～ということだ",
+        "sentence": "部長の話によると、今年の新入社員の数は去年の倍だということだ。",
+        "translation": "据部长说，今年新员工的数量是去年的一倍。"
+    },
+    {
+        "grammar": "～ということだ",
+        "sentence": "高橋さんから電話がありました。またあとで電話するとのことです。",
+        "translation": "高桥先生来过电话，他说回头再打来。"
+    },
+    {
+        "grammar": "～ということだ",
+        "sentence": "お孫さんがお生まれになったとのこと、おめでとうございます。",
+        "translation": "听说您的孙子出生了，恭喜啊。"
+    },
+    {
+        "grammar": "～について",
+        "sentence": "兄は大学院で、アジアの経済について研究しています。",
+        "translation": "哥哥在研究生院研究亚洲经济。"
+    },
+    {
+        "grammar": "～について",
+        "sentence": "今年度の求人情報については、ホームページをご覧ください。",
+        "translation": "关于本年度的招聘信息，请看主页。"
+    },
+    {
+        "grammar": "～について",
+        "sentence": "部屋を借りるときは安全面についても確認したほうがいい。",
+        "translation": "租房时最好确认一下安全方面的情况。"
+    },
+    {
+        "grammar": "～について",
+        "sentence": "この図書館には、機械工学についての本がたくさんある。",
+        "translation": "这个图书馆里有大量关于机械工程的书。"
+    },
+    {
+        "grammar": "～について",
+        "sentence": "N＋についての＋N",
+        "translation": "意味：关于、有关 表示成为话题、思考、调查的内容。"
+    },
+    {
+        "grammar": "～なきゃ",
+        "sentence": "④あ ! 大変! 宿題しなきゃ (いけない)。",
+        "translation": "④啊！糟糕！必须得做作业了。"
+    },
+    {
+        "grammar": "っけ",
+        "sentence": "クリーニング屋、何時までだっけ。",
+        "translation": "洗衣店开到几点来着？"
+    },
+    {
+        "grammar": "っけ",
+        "sentence": "そのケーキ、 どうしたの? 今日、だれかの誕生日だっけ。",
+        "translation": "那个蛋糕是怎么回事？今天是谁的生日？"
+    },
+    {
+        "grammar": "っけ",
+        "sentence": "高橋さん、昨日のパーティーにいらっしゃいましたっけ。",
+        "translation": "高桥先生，昨天的聚会您来了吗？"
+    },
+    {
+        "grammar": "っけ",
+        "sentence": "今度のテスト、来週の月曜日だったっけ。",
+        "translation": "下次考试是下周一来着。"
+    },
+    {
+        "grammar": "っけ",
+        "sentence": "電池、どこに入れてありましたっけ。",
+        "translation": "电池放在哪里了。"
+    },
+    {
+        "grammar": "って",
+        "sentence": "お金持ちだって、幸せじゃない人もいます。",
+        "translation": "即使有钱，也有不幸福的人。"
+    },
+    {
+        "grammar": "って",
+        "sentence": "病院に行ったって、すぐには治らないよ。",
+        "translation": "即使去了医院，也不能马上治好。"
+    },
+    {
+        "grammar": "って",
+        "sentence": "悲しくたって、 さびしくたって、絶対泣かない。",
+        "translation": "就算悲伤，就算寂寞，我绝对不会哭。"
+    },
+    {
+        "grammar": "って",
+        "sentence": "まだ若いので、一晩ぐらい寝なくたって大丈夫です。",
+        "translation": "因为还年轻，所以一晚不睡也没关系。"
+    },
+    {
+        "grammar": "～に決まってる",
+        "sentence": "あのチームは今年も最下位に決まってるよ。",
+        "translation": "那个队今年肯定还是最后一名。"
+    },
+    {
+        "grammar": "～に決まってる",
+        "sentence": "【简体：なAだ Nだ】",
+        "translation": "意味：表示强调“一定是～的”时。"
+    },
+    {
+        "grammar": "～にみたい",
+        "sentence": "となりのお嬢さん、今日成人式みたい。きれいな着物着て出ていったから。",
+        "translation": "隔壁的小姐，今天好像是她的成人仪式。因为她穿着漂亮的衣服出去了。"
+    },
+    {
+        "grammar": "～にみたい",
+        "sentence": "ようやく梅雨明けしたみたいだね。これから暑くなるね。",
+        "translation": "好像终于出梅了呢。今后会变热呢。"
+    },
+    {
+        "grammar": "～にみたい",
+        "sentence": "私、どこかで財布落としちゃったみたい。いくら探してもないのよ。",
+        "translation": "我好像在哪里丢了钱包。怎么找都找不到啊。"
+    },
+    {
+        "grammar": "～よかった",
+        "sentence": "急いでいたからタクシーに乗ったんだけど、乗らなければよかったよ。電車より",
+        "translation": "因为很急，所以坐了出租车，其实不打车就好了，比电车花的时间还久。"
+    },
+    {
+        "grammar": "～よかった",
+        "sentence": "このかばん、機内持ち込みだめだって。もうちょっと小さければよかったんだけ",
+        "translation": "听说这个包不能带上飞机。再小一点就好了……。"
+    },
+    {
+        "grammar": "～よかった",
+        "sentence": "もっと早く出かければよかった。",
+        "translation": "要是能再早一点出门就好了。"
+    },
+    {
+        "grammar": "～ばかり",
+        "sentence": "最近雨ばかりで、洗濯物が乾かなくて困っています。",
+        "translation": "最近总是下雨，洗的衣服不干，很为难。"
+    },
+    {
+        "grammar": "～ばかり",
+        "sentence": "ゲームばかりしていると、 目が悪くなりますよ。",
+        "translation": "只玩游戏的话，眼睛会变坏的。"
+    },
+    {
+        "grammar": "～ばかり",
+        "sentence": "逃げてばかりじゃ勝てないぞ。攻めていけ!",
+        "translation": "光逃跑是赢不了的。进攻！"
+    },
+    {
+        "grammar": "～ばかり",
+        "sentence": "あの子はいたずら好きで、みんなを困らせてばかりいる。",
+        "translation": "那个孩子爱淘气，总是让大家为难。"
+    },
+    {
+        "grammar": "～ばかり",
+        "sentence": "彼は文句を言うばかりで、ぜんぜん働かない。",
+        "translation": "他净发牢骚，一点也不工作。"
+    },
+    {
+        "grammar": "～ばかり",
+        "sentence": "コアラを見に行ったのに、寝ているばかりでぜんぜん動かないのでがっかりした。",
+        "translation": "我去看考拉了，可是考拉睡着一点也不动，我很失望。"
+    },
+    {
+        "grammar": "〜ように",
+        "sentence": "あのえんぴつのような形をしている建物は、電話会社のビルです。",
+        "translation": "那个铅笔形状的建筑物是电话公司的大楼。"
+    },
+    {
+        "grammar": "〜ように",
+        "sentence": "わが社の新しいロボットはまるで人間のように手足が自由に動きます。",
+        "translation": "我们公司的新机器人就像人一样手脚自由活动。"
+    },
+    {
+        "grammar": "〜ように",
+        "sentence": "あの2人が話していると、まるでけんかをしているように聞こえる。",
+        "translation": "那两个人一说话，听起来像是在吵架。"
+    },
+    {
+        "grammar": "〜ように",
+        "sentence": "今日は宿題が山のようにたくさんある。",
+        "translation": "今天作业多得堆积如山。"
+    },
+    {
+        "grammar": "〜ように",
+        "sentence": "夕方になって半額セールが始まると、お弁当は飛ぶように売れて、あっという間",
+        "translation": "到了傍晚，半价促销开始后，便当卖得飞快，一转眼就没有了。"
+    },
+    {
+        "grammar": "〜ように",
+        "sentence": "わあ、すごい汗だね。シャワーを浴びたみたい。",
+        "translation": "哇，好多汗啊。就像刚洗过澡了一样。"
+    },
+    {
+        "grammar": "〜ように",
+        "sentence": "氷のように冷たい手だ。",
+        "translation": "手冷得像冰一样。"
+    },
+    {
+        "grammar": "〜はもちろん〜も",
+        "sentence": "山形はスキーはもちろん、温泉もいいのでたいへん人気があります。",
+        "translation": "山形的滑雪自不必说，温泉也很好，所以很受欢迎。"
+    },
+    {
+        "grammar": "〜はもちろん〜も",
+        "sentence": "この店、 ラーメンはもちろん、ギョーザもおいしいと評判ですよ。",
+        "translation": "这家店的拉面自不必说，饺子也很好吃，口碑很好。"
+    },
+    {
+        "grammar": "〜はもちろん〜も",
+        "sentence": "このタイプの旅行保険は、事故はもちろん、病気や盗難も保障いたします。",
+        "translation": "这种类型的旅行保险不仅可以保障事故，还可以保障疾病和盗窃。"
+    },
+    {
+        "grammar": "〜はもちろん〜も",
+        "sentence": "父はゴルフが趣味で、週末はもちろん平日も仕事のあとで練習しています。",
+        "translation": "父亲的兴趣是打高尔夫，周末就不用说了，平时也在工作之后去练习。"
+    },
+    {
+        "grammar": "〜ほど〜ない",
+        "sentence": "今年の冬は去年ほど寒くないですね。",
+        "translation": "今年冬天不像去年那么冷。"
+    },
+    {
+        "grammar": "〜ほど〜ない",
+        "sentence": "和菓子はケーキほどカロリーが高くないと思って、つい食べすぎてしまう。",
+        "translation": "和式点心的卡路里不像蛋糕那么高，不知不觉就吃多了。"
+    },
+    {
+        "grammar": "〜ほど〜ない",
+        "sentence": "世の中はあなたが考えているほど甘くない。",
+        "translation": "世上没有你想的那么简单（甜蜜）。"
+    },
+    {
+        "grammar": "〜ほど〜ない",
+        "sentence": "昨日の数学のテストは、思ったほど難しくなかった。",
+        "translation": "昨天的数学考试没有想象的那么难。"
+    },
+    {
+        "grammar": "〜ほど〜ない",
+        "sentence": "今日見た映画は、友だちが言っていたほどおもしろくなかった。",
+        "translation": "今天看的电影没有朋友说的那么有趣。"
+    },
+    {
+        "grammar": "〜かわりに",
+        "sentence": "母の帰りが遅くなる日は、母のかわりに私が夕食を作ることになっている。",
+        "translation": "妈妈回来晚的那一天，由我代替妈妈做晚饭。"
+    },
+    {
+        "grammar": "〜かわりに",
+        "sentence": "スミスさんはそばを食べるとき、おはしのかわりにフォークを使うそうだ。",
+        "translation": "听说史密斯先生吃荞麦面时用叉子代替筷子。"
+    },
+    {
+        "grammar": "〜かわりに",
+        "sentence": "私たちは便利な生活を手に入れたかわりに、多くの自然を失った。",
+        "translation": "我们得到了便利的生活，却失去了很多自然。"
+    },
+    {
+        "grammar": "〜かわりに",
+        "sentence": "友だちに韓国語を教えるかわりに、日本料理の作り方を教えてもらっている。",
+        "translation": "我教朋友韩语，他教我做日本料理。"
+    },
+    {
+        "grammar": "〜かわりに",
+        "sentence": "今後はガソリンで走る車にかわって電気自動車が普及するのだろうか。",
+        "translation": "今后电车会代替燃油汽车得到普及吗。"
+    },
+    {
+        "grammar": "〜かわりに",
+        "sentence": "本日は、入院中の父にかわり、 私がごあいさつさせていただきます。",
+        "translation": "今天，我代替住院的父亲致词。"
+    },
+    {
+        "grammar": "V ない＋ずに（*する→せずに 来る→来ずに）",
+        "sentence": "かさを持たずに出かけて、雨に降られてしまった。",
+        "translation": "没带伞就出门了，结果被雨淋了。"
+    },
+    {
+        "grammar": "V ない＋ずに（*する→せずに 来る→来ずに）",
+        "sentence": "名前を書かずにテストを出してしまった。",
+        "translation": "没写名字就交卷了。"
+    },
+    {
+        "grammar": "V ない＋ずに（*する→せずに 来る→来ずに）",
+        "sentence": "涙のわけは聞かずに、そっとしておいてほしいと彼女に言われた。",
+        "translation": "我对她说，不要问为什么流泪，不要管我，让我静一静。"
+    },
+    {
+        "grammar": "V ない＋ずに（*する→せずに 来る→来ずに）",
+        "sentence": "宛先のアドレスをよく確認せずに送信してしまった。",
+        "translation": "我经常没确认好收件人地址就发信了。"
+    },
+    {
+        "grammar": "②手段 eg：包丁を使わないで/ずに、料理を作った。不用菜刀就做了菜",
+        "sentence": "すぐに戻ってきますから、机の上はこのままにしておいてください。",
+        "translation": "我马上就回来，桌子上的东西就这样，别动。"
+    },
+    {
+        "grammar": "②手段 eg：包丁を使わないで/ずに、料理を作った。不用菜刀就做了菜",
+        "sentence": "久しぶりに帰ったふるさとは以前のままだった。",
+        "translation": "好久没回去的故乡还是以前的样子。"
+    },
+    {
+        "grammar": "②手段 eg：包丁を使わないで/ずに、料理を作った。不用菜刀就做了菜",
+        "sentence": "日本では卵を生のまま食べるというのは本当ですか。",
+        "translation": "在日本生吃鸡蛋，是真的吗。"
+    },
+    {
+        "grammar": "②手段 eg：包丁を使わないで/ずに、料理を作った。不用菜刀就做了菜",
+        "sentence": "冬はくつ下をはいたまま寝ています。",
+        "translation": "冬天穿着袜子睡觉。"
+    },
+    {
+        "grammar": "②手段 eg：包丁を使わないで/ずに、料理を作った。不用菜刀就做了菜",
+        "sentence": "友だちから本を借りたままで、まだ返していない。",
+        "translation": "从朋友那里借了书，还没还。"
+    },
+    {
+        "grammar": "②手段 eg：包丁を使わないで/ずに、料理を作った。不用菜刀就做了菜",
+        "sentence": "部屋の電気をつけたまま寝てしまった。",
+        "translation": "开着房间的灯就睡着了。"
+    },
+    {
+        "grammar": "②手段 eg：包丁を使わないで/ずに、料理を作った。不用菜刀就做了菜",
+        "sentence": "この本は2冊買って、1冊は新しいままとっておくつもりです。",
+        "translation": "这本书我打算买两本，把新的一本收藏起来。"
+    },
+    {
+        "grammar": "②手段 eg：包丁を使わないで/ずに、料理を作った。不用菜刀就做了菜",
+        "sentence": "この冷蔵庫は魚でも野菜でも新鮮なまま保存できます。",
+        "translation": "这个冰箱无论是鱼还是蔬菜都可以新鲜地保存。"
+    },
+    {
+        "grammar": "②手段 eg：包丁を使わないで/ずに、料理を作った。不用菜刀就做了菜",
+        "sentence": "Vた＋まま Nの＋まま",
+        "translation": "意味：用于表示不改变状态，一直保持。也用来表示接下来必须做某事却没有做。（放"
+    },
+    {
+        "grammar": "～V ます",
+        "sentence": "アンケートを実施し、結果をまとめて発表する。",
+        "translation": "实施问卷调查，汇总结果并发表。"
+    },
+    {
+        "grammar": "～V ます",
+        "sentence": "交通ルールを守り、安全運転をしましょう。",
+        "translation": "遵守交通规则，安全驾驶吧。"
+    },
+    {
+        "grammar": "～V ます",
+        "sentence": "高速道路の料金が値下げされ、利用者が増えた。",
+        "translation": "高速公路费用下调，使用者增加。"
+    },
+    {
+        "grammar": "～ところ",
+        "sentence": "あくびしたところを写真に撮られたって、佐藤さん、怒ってたよ。",
+        "translation": "打哈欠的时候被拍了照片，佐藤生气了。"
+    },
+    {
+        "grammar": "～ところ",
+        "sentence": "大統領が記者会見をしているところに、緊急ニュースが飛び込んできた。",
+        "translation": "总统正在召开记者招待会时，突然传来了紧急新闻。"
+    },
+    {
+        "grammar": "～ところ",
+        "sentence": "部長がお客さんと話をしているところに声をかけて、あとで注意されてしまった。",
+        "translation": "部长在和客人说话的时候，我跟他说了一句话，后来被批评了。"
+    },
+    {
+        "grammar": "～ところ",
+        "sentence": "その亀は子どもたちにいじめられていたところを、太郎に助けられました。",
+        "translation": "那只乌龟被孩子们欺负的时候，被太郎救了。"
+    },
+    {
+        "grammar": "～ところ",
+        "sentence": "犯人は逃げようとしたところを、警官に撃たれ、重傷を負いました。",
+        "translation": "犯人正要逃跑时，被警察射击，受了重伤。"
+    },
+    {
+        "grammar": "V ます＋きる",
+        "sentence": "この目薬は2週間で使いきってください。残ったら使わないで捨ててください。",
+        "translation": "这个眼药水请在两周内用完。剩下的话不要用了请扔掉。"
+    },
+    {
+        "grammar": "V ます＋きる",
+        "sentence": "こんなたくさんの荷物、寮の部屋に入りきらないよ。",
+        "translation": "这么多行李，宿舍的房间装不下啊。"
+    },
+    {
+        "grammar": "V ます＋きる",
+        "sentence": "父はずっと残業が続いていて、疲れきった顔をしている。",
+        "translation": "父亲一直在加班，一副疲惫不堪的样子。"
+    },
+    {
+        "grammar": "V ます＋きる",
+        "sentence": "両親に反対されているけれど、歌手になる夢はどうしてもあきらめきれない。",
+        "translation": "虽然父母反对，但我无论如何也不能放弃成为歌手的梦想。"
+    },
+    {
+        "grammar": "V ます＋きる",
+        "sentence": "法全部做完的意思。可以用于一些惯用词组, 如“疲れきる”“困りきる”等, 形容",
+        "translation": "“非常～”。"
+    },
+    {
+        "grammar": "～おかけ",
+        "sentence": "今年の夏は新しいエアコンのおかげで快適に過ごせた。",
+        "translation": "今年夏天多亏了新的空调，过得很舒适。"
+    },
+    {
+        "grammar": "～おかけ",
+        "sentence": "子どもの病気が治ったのは山下先生のおかげです。",
+        "translation": "孩子的病治好了，多亏了山下老师。"
+    },
+    {
+        "grammar": "～おかけ",
+        "sentence": "みんなが手伝ってくれたおかげで、引っ越しが早く済んだ。",
+        "translation": "多亏了大家的帮忙，搬家很快就搞定了。"
+    },
+    {
+        "grammar": "～おかけ",
+        "sentence": "気候が温暖なおかげで、このあたりで作られるみかんは甘くておいしいと評判で",
+        "translation": "多亏了气候温暖，这一带种植的橘子又甜又好吃。"
+    },
+    {
+        "grammar": "～おかけ",
+        "sentence": "【简体：なAだな Nだの】",
+        "translation": "意味：因为“～”所以得到了好的结果，表达感谢、“太好了”的心情。"
+    },
+    {
+        "grammar": "～を通じて",
+        "sentence": "京都は1年を通じてたくさんの観光客が訪れる。",
+        "translation": "京都一年到头都有很多游客来访。"
+    },
+    {
+        "grammar": "～を通じて",
+        "sentence": "工場内は年間を通じて、気温·湿度が一定に保たれています。",
+        "translation": "工厂内全年气温、湿度保持不变。"
+    },
+    {
+        "grammar": "～を通じて",
+        "sentence": "弟は中学の3年間を通して、無遅刻、無欠席だった。",
+        "translation": "弟弟在初中的3年间，没有迟到，没有缺席。"
+    },
+    {
+        "grammar": "～を通じて",
+        "sentence": "彼とは仕事を通じて知り合った。",
+        "translation": "我是通过工作认识他的。"
+    },
+    {
+        "grammar": "～というと",
+        "sentence": "日本の花というと、桜がすぐ頭に浮かぶ。",
+        "translation": "说起日本的花，脑海中立刻浮现出樱花。"
+    },
+    {
+        "grammar": "～というと",
+        "sentence": "外国人に人気のある観光地といえば、やはり京都でしょうか。",
+        "translation": "说到受外国人欢迎的观光地，果然还是京都吧。"
+    },
+    {
+        "grammar": "～というと",
+        "sentence": "ファストフードといえば、何といってもハンバーガーだろう。",
+        "translation": "说起快餐，无疑就是汉堡包吧。"
+    },
+    {
+        "grammar": "～というと",
+        "sentence": "冬のスポーツといったら、やっぱりスキーだよね。",
+        "translation": "说起冬天的运动，果然还是滑雪啊。"
+    },
+    {
+        "grammar": "～というと",
+        "sentence": "“～というと/～といえば/～いったら”表示从前面的词语出发，大部分人会联想到",
+        "translation": "的事物。多用于知名的或有代表性的东西。"
+    },
+    {
+        "grammar": "～というと",
+        "sentence": "eg：地震が起こった時の怖さと言ったら、思い出しても恐ろしい。",
+        "translation": "说起地震发生时的恐怖，想起来也很可怕。"
+    },
+    {
+        "grammar": "～というと",
+        "sentence": "eg：ここは便利といえば便利ですが、電車の音がうるさいですね。",
+        "translation": "这里方便是方便，但是电车的声音太吵了。"
+    },
+    {
+        "grammar": "～べきだ",
+        "sentence": "人にお金を借りたらすぐに返すべきだ。",
+        "translation": "向别人借钱的话，应该马上还。"
+    },
+    {
+        "grammar": "～べきだ",
+        "sentence": "上司に相談するべきかどうか悩むことがある。",
+        "translation": "有时会烦恼，是否应该和上司商量。"
+    },
+    {
+        "grammar": "～べきだ",
+        "sentence": "慣れない人は雪道で車の運転をするべきではないと思う。",
+        "translation": "我认为不习惯的人不应该在雪道上开车。"
+    },
+    {
+        "grammar": "～べきだ",
+        "sentence": "特に問題がなくても仕事の経過は上司に報告すべきですよ。",
+        "translation": "即使没有什么特别的问题，工作的过程也应该向上司报告。"
+    },
+    {
+        "grammar": "～べきだ",
+        "sentence": "やるべきことはすべてやったんだから、自信を持って試合にのぞめばいいよ。",
+        "translation": "应该做的事都做了，自信地去参加考试就行了。"
+    },
+    {
+        "grammar": "～べきだ",
+        "sentence": "面接試験の前に思ったことは、社会の様子を知るために毎日、新聞を読んでおく",
+        "translation": "面试前想到的是，为了了解社会情况，应该每天读报纸。"
+    },
+    {
+        "grammar": "～べきだ",
+        "sentence": "Vる＋べき＋N",
+        "translation": "意味：责任、义务、道德上的应该"
+    },
+    {
+        "grammar": "～にとって",
+        "sentence": "今回の旅行は私にとって忘れられない思い出になるだろう。",
+        "translation": "这次旅行对我来说应该会是一个难忘的回忆。"
+    },
+    {
+        "grammar": "～にとって",
+        "sentence": "農家にとって天候不順は深刻な問題だ。",
+        "translation": "对农民来说气象反常是一个严重的问题。"
+    },
+    {
+        "grammar": "～にとって",
+        "sentence": "だれにとってもいちばん大切なものは健康だと思います。",
+        "translation": "我想无论对谁来说，最重要的都是健康。"
+    },
+    {
+        "grammar": "～にとって",
+        "sentence": "ネットショッピングは、消費者にとっても、企業にとっても便利なシステムだ。",
+        "translation": "无论对消费者，还是对企业来说，网店都是一个便捷的系统。"
+    },
+    {
+        "grammar": "～にとって",
+        "sentence": "都会は、いろいろなものがあって、若者にとっては楽しいところだろう。",
+        "translation": "大城市的世界丰富多彩，对于年轻人来说应该是一片乐土吧。"
+    },
+    {
+        "grammar": "～にとって",
+        "sentence": "子どもにとって遊びは大切だ。",
+        "translation": "对孩子来说，玩耍很重要。"
+    },
+    {
+        "grammar": "～ば～ほど",
+        "sentence": "言葉を勉強すればするほどその国への理解も深まると言われている。",
+        "translation": "人们都说，语言学着学着，对那个国家的理解也会越来越深。"
+    },
+    {
+        "grammar": "～ば～ほど",
+        "sentence": "旅行の荷物は少なければ少ないほど楽なのに、つい持ち物が増えてしまう。",
+        "translation": "旅游的行李越少越轻松，但就是会不知不觉地越带越多。"
+    },
+    {
+        "grammar": "～ば～ほど",
+        "sentence": "まじめな政治家であればあるほど、理想と現実の違いに悩むことになる。",
+        "translation": "越是认真严谨的政治家，越容易烦恼理想与现实的差距。"
+    },
+    {
+        "grammar": "～ば～ほど",
+        "sentence": "寒ければ寒いほど鍋がおいしい。",
+        "translation": "越冷火锅越好吃。"
+    },
+    {
+        "grammar": "～による",
+        "sentence": "午前3時ごろ地震が発生しましたが、この地震による津波の心配はありません。",
+        "translation": "凌晨3点发生了地震，这场地震不会引起海啸，请不用担心。"
+    },
+    {
+        "grammar": "～による",
+        "sentence": "今回の大事故はスピードの出しすぎによるものだそうだ。",
+        "translation": "据说这次的重大事故是超速引起的。"
+    },
+    {
+        "grammar": "～による",
+        "sentence": "あの会社は新商品のヒットによって、一気に知名度が上がった。",
+        "translation": "那家公司凭借新商品热卖，知名度猛涨。"
+    },
+    {
+        "grammar": "～による",
+        "sentence": "海外生活を経験したことによって、視野が広がった。",
+        "translation": "通过海外生活的经验，拓宽了视野。"
+    },
+    {
+        "grammar": "～による",
+        "sentence": "事故は運転手の不注意によるものだ。",
+        "translation": "事故是由于司机疏忽造成的。"
+    },
+    {
+        "grammar": "～による",
+        "sentence": "N＋によって",
+        "translation": "意味：导致……发生的原因 表示因为这个原因、理由导致发生了某事。"
+    },
+    {
+        "grammar": "～による",
+        "sentence": "この事故は運転ミスによるものだ。",
+        "translation": "这起事故是由于驾驶失误造成的。"
+    },
+    {
+        "grammar": "～による",
+        "sentence": "その仕事は加藤さんによってなされました。那个工作是加藤先生做的。",
+        "translation": "③手段"
+    },
+    {
+        "grammar": "～による",
+        "sentence": "インターネットにより世界のニュースを知る。通过网络了解世界新闻。",
+        "translation": "④原因/理由"
+    },
+    {
+        "grammar": "～ばかりでなく～も",
+        "sentence": "落語は最近、お年寄りばかりでなく若い女性にも人気が出てきた。",
+        "translation": "最近，不仅是老年人，落语还在年轻女性当中开始受到欢迎。"
+    },
+    {
+        "grammar": "～ばかりでなく～も",
+        "sentence": "あの会社の就職試験では一般常識や専門についての筆記試験ばかりでなく、グル",
+        "translation": "听说那家公司的入职考试，除了一般常识及专业知识的笔试之外，还有小组讨论。"
+    },
+    {
+        "grammar": "～ばかりでなく～も",
+        "sentence": "野菜が値上がりしたのは、夏に気温が低かったばかりでなく、台風の被害もあっ",
+        "translation": "听说蔬菜涨价不仅仅因为夏季气温低，还因为受到了台风灾害的影响。"
+    },
+    {
+        "grammar": "～ばかりでなく～も",
+        "sentence": "当社の社員食堂は安くておいしいばかりでなく、栄養のバランスもいいので評ば",
+        "translation": "我们公司的员工食堂不但便宜、美味，而且营养均衡，广受赞誉。"
+    },
+    {
+        "grammar": "～ばかりでなく～も",
+        "sentence": "スポーツ選手は運動するばかりでなく、十分な休養をとることも大切だ。",
+        "translation": "运动员不光要运动，充分休息也非常重要。"
+    },
+    {
+        "grammar": "～ばかりでなく～も",
+        "sentence": "今日は電車で足を踏まれたばかりか、かばんに入れておいたサンドイッチも",
+        "translation": "叔叔不仅帮我出了学费，还给我了全部的生活费，让我去日本留学。"
+    },
+    {
+        "grammar": "～ばかりでなく～も",
+        "sentence": "【简体：なAだな Nだ】",
+        "translation": "意味：不仅A，B也"
+    },
+    {
+        "grammar": "～ばかりでなく～も",
+        "sentence": "ん判になります。",
+        "translation": "例文："
+    },
+    {
+        "grammar": "～たびに",
+        "sentence": "父は出張のたびにお土産を買ってきてくれる。",
+        "translation": "爸爸每次出差都会买纪念品回来。"
+    },
+    {
+        "grammar": "～たびに",
+        "sentence": "知り合いの子は会うたびに大きくなっていて、びっくりする。",
+        "translation": "朋友的小孩，每次见面都长大好多，让人吃惊。"
+    },
+    {
+        "grammar": "～たびに",
+        "sentence": "山に登るたびにもうやめたいと思うのに、頂上に着くたびにのぼまた登りたいと",
+        "translation": "每次登山的时候都会想以后再也不爬山了，但每次登到山顶又会想继续。"
+    },
+    {
+        "grammar": "～たびに",
+        "sentence": "体重計に乗るたびにやせようと思うのだが……。",
+        "translation": "每次站上体重秤时，都会想要减肥……"
+    },
+    {
+        "grammar": "～たびに",
+        "sentence": "Nの＋たび（に）",
+        "translation": "意味：就一些重复做的事情，表示“每次做的时候都”的意思。"
+    },
+    {
+        "grammar": "～はずだ",
+        "sentence": "となりのうちから変な音がするよ。今だれもいないはずなのに……。",
+        "translation": "隔壁邻居家里传来奇怪的声音。这个时间应该没人在的呀……"
+    },
+    {
+        "grammar": "～はずだ",
+        "sentence": "【简体：なAだな Nだの】",
+        "translation": "意味：有根据有理由的推测，应该；“因为有确切的理由，所以无疑就是～”"
+    },
+    {
+        "grammar": "～ですと",
+        "sentence": "今月中にご入会されますと、1か月分の会費が無料になります。",
+        "translation": "如果您本月入会，就可以免除一个月的会费。"
+    },
+    {
+        "grammar": "～ですと",
+        "sentence": "午後5時前にご来店いただきますと、ドリンクを1杯サービスいたします。",
+        "translation": "如果您下午5点之前光临本店，我们将免费赠送一杯饮料。"
+    },
+    {
+        "grammar": "～ですと",
+        "sentence": "継続手続きをされませんと、再度人会金が必要になりますので、ご注意ください。",
+        "translation": "如果不办理续约，过期之后是需要缴纳再次入会费的，这一点请您注意。"
+    },
+    {
+        "grammar": "～ですと",
+        "sentence": "こちらのセットですと、送料が無料になります。",
+        "translation": "如果选这个套装，邮费可以免除。"
+    },
+    {
+        "grammar": "～ようなら",
+        "sentence": "熱が下がらないようだったら病院に行ったほうがいいですよ。",
+        "translation": "如果烧不见退，最好去医院。"
+    },
+    {
+        "grammar": "～ようなら",
+        "sentence": "その仕事、今日終わらせるのが無理なようなら、明日でもかまいませんよ。",
+        "translation": "那工作，如果今天完不成的话，明天也行。"
+    },
+    {
+        "grammar": "～ようなら",
+        "sentence": "子どもさんが音楽に興味がないようだったら、無理にピアノを習わせる必要はな",
+        "translation": "要是您的小孩对音乐不感兴趣，我觉着没必要非得让他学钢琴。"
+    },
+    {
+        "grammar": "～ようなら",
+        "sentence": "特にご意見がないようでしたら、今日の会議はこれで終了いたします。",
+        "translation": "如果没有什么特别的意见，今天的会议就到此结束。"
+    },
+    {
+        "grammar": "～V てくる 句末：V てきた",
+        "sentence": "朝から降っていた雨がやんで、ちょっと晴れてきた。",
+        "translation": "早上开始一直下的雨停了，开始放晴了。"
+    },
+    {
+        "grammar": "～V てくる 句末：V てきた",
+        "sentence": "料理番組を見ていたら、おなかがすいてきた。",
+        "translation": "看着美食节目，肚子都饿了。"
+    },
+    {
+        "grammar": "～V てくる 句末：V てきた",
+        "sentence": "まあ、赤ちゃん、歯が生えてきましたね。かわいいですね。",
+        "translation": "哇，小婴儿长牙了呢。好可爱。"
+    },
+    {
+        "grammar": "～V てくる 句末：V てきた",
+        "sentence": "『だれでもやる気が出てくる数学』という参考書を買った。",
+        "translation": "买了一本参考书，书名叫《谁都能越学越有干劲的数学》"
+    },
+    {
+        "grammar": "～ものだから",
+        "sentence": "慣れないものですから、ご迷惑をおかけするかもしれませんが、どうぞよろしね",
+        "translation": "我还是一个新手，可能会给各位添麻烦，请大家多多关照。"
+    },
+    {
+        "grammar": "～ものだから",
+        "sentence": "余計な一言を言ってしまったものだから、取引先の部長を怒らせてしまった。",
+        "translation": "就因为多嘴说了不该说的，把客户公司的部长给惹恼了。"
+    },
+    {
+        "grammar": "～ものだから",
+        "sentence": "出張中だったもので、先日の会議に出席できなくて、申し訳ございませんでした。",
+        "translation": "我出差了，所以没参加前几天的会议，实在抱歉。"
+    },
+    {
+        "grammar": "～ものだから",
+        "sentence": "「简体：なAだな Nだの」",
+        "translation": "意味：用于个人的解释，辩解（后半句基本不使用命令、意志等句子）"
+    },
+    {
+        "grammar": "～なんか",
+        "sentence": "こちらのセーターなんかいかがでしょう。この色は今年の流行色ですよ。",
+        "translation": "这款毛衣怎么样?颜色是今年的流行色哦。"
+    },
+    {
+        "grammar": "～なんか",
+        "sentence": "スープにするなら、この肉なんかいいと思いますよ。",
+        "translation": "煲汤的话，这肉很适合哦。"
+    },
+    {
+        "grammar": "～なんか",
+        "sentence": "温泉旅行のプレゼントなんてお年寄りにとても喜ばれますよ。",
+        "translation": "温泉旅游的礼物什么的，可讨老年人喜欢了。"
+    },
+    {
+        "grammar": "～かと思う",
+        "sentence": "今週はちょっと難しいですが、来週なら時間が取れるかと思います。",
+        "translation": "这周有点难，下周的话可能可以安排时间。"
+    },
+    {
+        "grammar": "～かと思う",
+        "sentence": "こちらのほうがお似合いかと思いますよ。",
+        "translation": "我觉得这款比较适合您。"
+    },
+    {
+        "grammar": "～かと思う",
+        "sentence": "こちらのプランで問題はないかと思いますが、いかがでしょうか。",
+        "translation": "我觉得这套方案可行，您觉得呢?"
+    },
+    {
+        "grammar": "～うちに",
+        "sentence": "今はまだ上手じゃなくても練習を重ねるうちにできるようになるよ。",
+        "translation": "就算现在还不熟练，不停地练习练习，慢慢就能学会了。"
+    },
+    {
+        "grammar": "～うちに",
+        "sentence": "何度も会っているうちに、相手のことがよくわかるようになった。",
+        "translation": "跟对方见过多次之后，逐渐了解了对方。"
+    },
+    {
+        "grammar": "～うちに",
+        "sentence": "留守にしているうちに、庭に雑草が生えてしまった。",
+        "translation": "不在家的这段时间，院子里长杂草了。"
+    },
+    {
+        "grammar": "～うちに",
+        "sentence": "調査を進めるうちにその企業の問題点が明らかになった。",
+        "translation": "随着调查的深入，那家企业的问题慢慢明朗了。"
+    },
+    {
+        "grammar": "V たばかり",
+        "sentence": "父は昨日退院したばかりなのに、今日から会社に出ている。",
+        "translation": "父亲昨天刚刚出院，今天居然就上班了。"
+    },
+    {
+        "grammar": "V たばかり",
+        "sentence": "日本に来たばかりのころは、電車にも乗れませんでした。",
+        "translation": "刚来日本的时候，连电车都不会坐。"
+    },
+    {
+        "grammar": "V たばかり",
+        "sentence": "引っ越してきたばかりで、近所に住んでいる人がまだよくわからない。",
+        "translation": "我刚刚搬来，还不怎么认识附近的住户。"
+    },
+    {
+        "grammar": "V たばかり",
+        "sentence": "あれ、あの人の名前何だっけ? さっき聞いたばかりなのに…。",
+        "translation": "咦?那人叫什么名字来着?刚刚问的就……"
+    },
+    {
+        "grammar": "～ばいいのに",
+        "sentence": "このバイト、時給がもう少し高ければいいのになあ。",
+        "translation": "这份兼职，要是时薪再高一点就好了。"
+    },
+    {
+        "grammar": "～ばいいのに",
+        "sentence": "このかばん、高すぎるよ。半額ならいいのになあ。",
+        "translation": "这个包太贵了。半价的话就可以买了。"
+    },
+    {
+        "grammar": "～ばいいのに",
+        "sentence": "もう帰るの? もっとゆっくりしていけばいいのに。",
+        "translation": "这就要回家了?再坐一坐呗。"
+    },
+    {
+        "grammar": "～ばいいのに",
+        "sentence": "またコンビニ弁当? たまには自分で作ればいいのに……。",
+        "translation": "又是便利店的盒饭?你偶尔也自己做做饭呗……"
+    },
+    {
+        "grammar": "V てもらってもいい",
+        "sentence": "ファイルで送りますから、アドレス教えてもらってもいいですか。",
+        "translation": "我发文件给您，能告诉我一下您的邮箱地址吗?"
+    },
+    {
+        "grammar": "V てもらってもいい",
+        "sentence": "悪いけど、ちょっとこの机運ぶの、手伝ってもらってもいい?",
+        "translation": "不好意思，能帮我搬一下这张桌子吗?"
+    },
+    {
+        "grammar": "V てもらってもいい",
+        "sentence": "すみませんが、もう一度説明していただいてもいいですか。",
+        "translation": "不好意思，能麻烦您再解释一遍吗?"
+    },
+    {
+        "grammar": "ご～いただく",
+        "sentence": "本日はお忙しい中、お集まりいただき、たいへん感謝しております。",
+        "translation": "今天，各位在百忙之中拨冗一聚，实在万分感谢。"
+    },
+    {
+        "grammar": "ご～いただく",
+        "sentence": "最後までお聞きくださいまして、ありがとうございました。",
+        "translation": "感谢各位听完我的演讲。"
+    },
+    {
+        "grammar": "ご～いただく",
+        "sentence": "先生が先日ご紹介くださった本はたいへん参考になりました。",
+        "translation": "前几天老师介绍给我的那本书非常有帮助。"
+    },
+    {
+        "grammar": "ご～いただく",
+        "sentence": "お手完にチケットをご角意いただき、こちらに並んでお待ちください。",
+        "translation": "麻烦各位准备好票，拿在手上，到这边来排队等候。"
+    },
+    {
+        "grammar": "ご～いただく",
+        "sentence": "ご確認いただけますでしょうか。",
+        "translation": "方便请您确认一下吗？"
+    },
+    {
+        "grammar": "～てました",
+        "sentence": "銀行に行かなきゃいけませんので、 これで失礼します。",
+        "translation": "我得去一趟银行，先告辞了。"
+    },
+    {
+        "grammar": "～てました",
+        "sentence": "これ、もう使いませんよね。捨てちゃいますよ。",
+        "translation": "这已经不能再用了吧，那我就扔掉了。"
+    },
+    {
+        "grammar": "～てました",
+        "sentence": "昨日はずっと雨が降ってました。",
+        "translation": "昨天一直在下雨。"
+    },
+    {
+        "grammar": "～てました",
+        "sentence": "在很有礼貌地进行对答时,也可以使用“～てます”“～ときます”“～ちゃいます”",
+        "translation": "的形式。"
+    },
+    {
+        "grammar": "～存じ上げて",
+        "sentence": "久しぶりにお目にかかるのを楽しみにしています。",
+        "translation": "好久不见了，期待与您的这次见面。"
+    },
+    {
+        "grammar": "～存じ上げて",
+        "sentence": "知る 存じ上げる",
+        "translation": "意味：表示敬意的自谦语"
+    },
+    {
+        "grammar": "お～です",
+        "sentence": "お呼び出しいたします。鈴木一郎君のお母様、一郎君出口が迷子センターでお待",
+        "translation": "现在广播找人。铃木一郎小朋友的妈妈，一郎小朋友在迷路儿童中心等您。"
+    },
+    {
+        "grammar": "お～です",
+        "sentence": "山川さん、保険証をお持ちですか。",
+        "translation": "山川先生，您有保险证吗?"
+    },
+    {
+        "grammar": "お～です",
+        "sentence": "当ホテルには何日間ご滞在ですか。",
+        "translation": "您打算入住本酒店多少天呢?"
+    },
+    {
+        "grammar": "お～です",
+        "sentence": "作家の上野先生は新聞、テレビなどでもご活躍です。",
+        "translation": "作家上野老师在报纸、电视等媒体上也都非常活跃。"
+    },
+    {
+        "grammar": "お～です",
+        "sentence": "ロープウェイをお待ちのお客様はこちらにお並びください。",
+        "translation": "等候搭乘缆车的游客请在这里排队。"
+    },
+    {
+        "grammar": "お～です",
+        "sentence": "お降りの際は足元にご注意ください。",
+        "translation": "下车时请留心脚下。"
+    },
+    {
+        "grammar": "お～です",
+        "sentence": "いる)。除了“待つ(等)”“持つ(有)”等动词，还可以和“滞在(停留)”“専攻(专",
+        "translation": "业)”“研究(研究)”“担当(负责)”“活躍(活跃)”等名词一起使用。"
+    },
+    {
+        "grammar": "～でしょうか",
+        "sentence": "山に登るとき、何か気をつけることがありますでしょうか。",
+        "translation": "登山的时候有什么需要注意的地方吗?"
+    },
+    {
+        "grammar": "～でしょうか",
+        "sentence": "何かアドバイスをお願いできませんでしょうか。",
+        "translation": "您能给我一些建议吗?"
+    },
+    {
+        "grammar": "～でしょうか",
+        "sentence": "部長、先日提出した報告書、ミスはなかったでしょうか。",
+        "translation": "部长，我前几天提交的报告，有什么错误吗?"
+    },
+    {
+        "grammar": "～でしょうか",
+        "sentence": "次回の打ち合わせは来週の火曜日でしたでしょうか。",
+        "translation": "下次碰头会约的是下周二吧?"
+    },
+    {
+        "grammar": "～でしょうか",
+        "sentence": "お名前を伺ってもよろしいでしょうか。",
+        "translation": "可以请教您的姓名吗？"
+    },
+    {
+        "grammar": "～でいらっしゃる",
+        "sentence": "外国に住んでいらっしゃる方にアンケートをお願いしました。",
+        "translation": "我麻烦居住在外国的人做了问卷调查。"
+    },
+    {
+        "grammar": "～でいらっしゃる",
+        "sentence": "先生がどう思っていらっしゃるか、よくわかりません。",
+        "translation": "不太清楚老师是怎么想的。"
+    },
+    {
+        "grammar": "～でいらっしゃる",
+        "sentence": "奥様は音楽の先生でいらっしゃいます。",
+        "translation": "夫人是教音乐的老师。"
+    },
+    {
+        "grammar": "～でいらっしゃる",
+        "sentence": "お客様があちらでお待ちでいらっしゃいます。",
+        "translation": "客人在那边等着。"
+    },
+    {
+        "grammar": "～でいらっしゃる",
+        "sentence": "伊藤先生はご専門分野だけでなく、多方面でご活躍でいらっしゃいます。",
+        "translation": "伊藤老师不仅在专业领域，而且在许多方面都非常活跃"
+    },
+    {
+        "grammar": "～させてさせていただく",
+        "sentence": "出張に会社の車を使わせていただいてもかまいませんか。",
+        "translation": "我可以开公司的车去出差吗?"
+    },
+    {
+        "grammar": "～させてさせていただく",
+        "sentence": "そのお年寄りは昔の話をいろいろ聞かせてくださいました。",
+        "translation": "那位老人家跟我说了许多以前的事情。"
+    },
+    {
+        "grammar": "～てからでなければ",
+        "sentence": "この会社では、3か月の研修を受けてからでなければ正社員になれません。",
+        "translation": "在这家公司，不接受三个月的培训是无法成为正式员工的。"
+    },
+    {
+        "grammar": "～てからでなければ",
+        "sentence": "大切なことは、両親に相談してからでなければ決められない。",
+        "translation": "大事必须跟父母商量之后才能决定。"
+    },
+    {
+        "grammar": "～てからでなければ",
+        "sentence": "初めてコンタクトレンズを買うときは、眼科の検査を受けてからでないと買えま",
+        "translation": "首次购买隐形眼镜时，必须接受眼科检查之后才能买。"
+    },
+    {
+        "grammar": "～かのように",
+        "sentence": "リンさんの部屋はまるで泥棒が入ったかのように散らかっている。",
+        "translation": "小林的房间乱得简直就像遭了贼一样。"
+    },
+    {
+        "grammar": "～かのように",
+        "sentence": "4月なのにまるで冬に戻ったかのような寒い日が続いている。",
+        "translation": "都4月了，接连几天就像回到了冬天一样寒冷。"
+    },
+    {
+        "grammar": "～かのように",
+        "sentence": "このあたりは紅葉の名所で、秋になると山全体が燃えているかのように赤く染ま",
+        "translation": "这一带被称为赏红叶的好去处，一到秋天，就像整座山都在燃烧一样，染成火红一片。"
+    },
+    {
+        "grammar": "～かのように",
+        "sentence": "犯人は警察に質問されて、事件のことを何も知らないかのように答えていた。",
+        "translation": "犯人受到警察的质问，回答得好像对事件的情况完全不知道一样。"
+    },
+    {
+        "grammar": "～かのように",
+        "sentence": "山本さんは子犬をまるで自分の子どもであるかのようにかわいがっている。",
+        "translation": "山本就像疼爱自己的孩子一样疼爱着小狗。"
+    },
+    {
+        "grammar": "～うちに",
+        "sentence": "アイスクリームが溶けないうちに食べよう。",
+        "translation": "趁冰淇淋没有融化，快点吃吧。"
+    },
+    {
+        "grammar": "～うちに",
+        "sentence": "銀行が開いているうちに振り込みに行かなければならない。",
+        "translation": "得赶在银行关门之前去汇款。"
+    },
+    {
+        "grammar": "～うちに",
+        "sentence": "「鉄は熱いうちに打て」ということわざは「若いうちにきたえたほうがいい」と",
+        "translation": "“趁热打铁”这句俗语的意思是“趁年轻的时候最好多历练”。"
+    },
+    {
+        "grammar": "～うちに",
+        "sentence": "子どものうちに、外国語を習わせたほうがいいという意見もある。",
+        "translation": "也有意见觉得最好在孩子小的时候就让他学好外语。"
+    },
+    {
+        "grammar": "～うちに",
+        "sentence": "この魚はいたみやすいので、新鮮なうちに港に運ばれ、すぐ加工される。",
+        "translation": "这鱼容易坏，所以要趁新鲜运回码头，马上进行加工。"
+    },
+    {
+        "grammar": "～向け",
+        "sentence": "これは子ども向けの映画だが、大人にも人気がある。",
+        "translation": "这部电影是拍给小孩看的，但大人们也很喜欢。"
+    },
+    {
+        "grammar": "～向け",
+        "sentence": "最近の若い女性向けの雑誌はファッションやグルメの記事が多い。",
+        "translation": "这本杂志是面向年轻女性的，内容以时尚、美食为主。"
+    },
+    {
+        "grammar": "～向け",
+        "sentence": "当社では輸出向けに左ハンドルの車を生産しています。",
+        "translation": "本公司生产出口专供的汽车，驾驶座在左边。"
+    },
+    {
+        "grammar": "～向け",
+        "sentence": "最近は独身者向けのワンルームマンションがあちこちに建てられている。",
+        "translation": "最近，四处都在建造适合单身人士居住的一室户公寓。"
+    },
+    {
+        "grammar": "～向け",
+        "sentence": "N＋むけの＋N",
+        "translation": "意味：面向……，针对……"
+    },
+    {
+        "grammar": "～",
+        "sentence": "この山は、道が狭くてけわしいので経験者向きです。",
+        "translation": "这座山，路窄且险，适合有经验的人士。"
+    },
+    {
+        "grammar": "～",
+        "sentence": "この服はかっこいいけれど仕事向きじゃないから買わないことにした。",
+        "translation": "这件衣服很可爱，但不适合穿着去上班，所以我决定不买了。 接"
+    },
+    {
+        "grammar": "～",
+        "sentence": "いろいろな人がいるのだから、人によって好みや考え方が違うのは当然だ。",
+        "translation": "各种各样的人都有，所以喜好、想法因人而异是理所当然的。"
+    },
+    {
+        "grammar": "～",
+        "sentence": "スーパーでは曜日によって特売品を設定するなど、集客のための工夫をしてい",
+        "translation": "超市下功夫吸引顾客，比如一个星期的每一天都会提供不同的特价商品等等。"
+    },
+    {
+        "grammar": "～",
+        "sentence": "コンビニでは地域によってお弁当などの味つけを変えているそうだ。",
+        "translation": "据说，便利店会根据不同地域，改变盒饭等的调味。"
+    },
+    {
+        "grammar": "～",
+        "sentence": "この調査結果を見ると、世代によるインターネットの利用目的の違いがわかりま",
+        "translation": "看了这个问卷调查，我们可以知道每个年龄段的人使用网络的目的是不同的。"
+    },
+    {
+        "grammar": "～",
+        "sentence": "この薬は人によっては副作用が出ることがあります。",
+        "translation": "有的人服用这种药可能会产生副作用。"
+    },
+    {
+        "grammar": "～",
+        "sentence": "参加者の人数によっては、会場を変更するかもしれません。",
+        "translation": "看参加者的人数，有可能会更换会场。"
+    },
+    {
+        "grammar": "～",
+        "sentence": "台風の進路によっては交通機関に影響が出る場合もあります。",
+        "translation": "根据台风的路线，有可能会影响交通。"
+    },
+    {
+        "grammar": "～",
+        "sentence": "天候によっては、試合が中止になることもあります。",
+        "translation": "视天气情况，比赛有时也会被取消。"
+    },
+    {
+        "grammar": "～",
+        "sentence": "地域による文化の違いを学ぶのは面白い。",
+        "translation": "了解因地区不同而产生的文化差异很有意思。"
+    },
+    {
+        "grammar": "～",
+        "sentence": "場所によっては携帯が圏外になるところもある。",
+        "translation": "有些地方会因为位置原因手机没信号。"
+    },
+    {
+        "grammar": "～最中",
+        "sentence": "引っ越しの最中に飼っている犬が逃げ出して、大騒ぎになった。",
+        "translation": "搬家时，我养的狗跑出去了，引起了一阵骚乱。"
+    },
+    {
+        "grammar": "～最中",
+        "sentence": "データを入力している最中に、 コンピューターがフリーズしてしまった。",
+        "translation": "正在输入数据的时候，电脑死机了。"
+    },
+    {
+        "grammar": "～最中",
+        "sentence": "この扉の向こうでは、連続殺人事件の裁判が行われている最中です。",
+        "translation": "这扇大门的那一边正在进行连环杀人案的审判。"
+    },
+    {
+        "grammar": "～最中",
+        "sentence": "Vている・Nの＋最中だ",
+        "translation": "意味：正在……的时候（发生意想不到的事、不想被打扰）"
+    },
+    {
+        "grammar": "～かけ",
+        "sentence": "弟の部屋には作りかけのプラモデルがいくつもある。",
+        "translation": "弟弟房间里有好几个没做完的塑料模型。"
+    },
+    {
+        "grammar": "～かけ",
+        "sentence": "図書館で借りた本、まだ読みかけだったのに返却日になってしまった。",
+        "translation": "从图书馆借来的书还没有看完，却已经到期了。"
+    },
+    {
+        "grammar": "～かけ",
+        "sentence": "セーターを編みかけて、途中であきらめたことが何度もある。",
+        "translation": "毛衣还在织，中途还放弃了好几次。"
+    },
+    {
+        "grammar": "～かけ",
+        "sentence": "食べかけのケーキを冷蔵庫に入れた。",
+        "translation": "把吃到一半的蛋糕放进了冰箱。"
+    },
+    {
+        "grammar": "～ずにはいられない",
+        "sentence": "一流の水泳選手はみんな、毎日練習せずにはいられないらしい。",
+        "translation": "听说，一流的游泳运动员无一例外，每天都必须要训练。"
+    },
+    {
+        "grammar": "～ずにはいられない",
+        "sentence": "彼女は毎日ケーキを食べないではいられないらしい。",
+        "translation": "听说她每天都得吃蛋糕。"
+    },
+    {
+        "grammar": "～ずにはいられない",
+        "sentence": "お祭りだと言われると、行かないではいられなくなってしまう。",
+        "translation": "一听说是庙会，就忍不住想去。"
+    },
+    {
+        "grammar": "～ずにはいられない",
+        "sentence": "悲しくて泣かずにはいられなかった。",
+        "translation": "太难过了，忍不住哭了出来。"
+    },
+    {
+        "grammar": "～わけがない",
+        "sentence": "相手は世界でトップのチームだし、がんばったって、勝てるわけがない。",
+        "translation": "对方是全球顶尖的球队，再拼命也不可能赢。"
+    },
+    {
+        "grammar": "～わけがない",
+        "sentence": "ちゃんと準備したんだから、プレゼン、 うまく行かないわけがないよ。もっと",
+        "translation": "你准备得很好了，所以汇报不可能做不好的。你得自信一点。"
+    },
+    {
+        "grammar": "～わけがない",
+        "sentence": "彼がそんなことをするわけがない。",
+        "translation": "他不可能做那种事。"
+    },
+    {
+        "grammar": "～しかない",
+        "sentence": "入学試験まであと1週間。とにかくがんばるしかありません。",
+        "translation": "离入学考试还有一个星期。不管怎么样，只能努力了。"
+    },
+    {
+        "grammar": "～しかない",
+        "sentence": "台風で飛行機は欠航だし、お金もないし、空港で1泊するしかない。",
+        "translation": "航班因为台风取消了，还没有钱，只好在机场里待上一晚了。"
+    },
+    {
+        "grammar": "～しかない",
+        "sentence": "全員が集まれるのは、金曜の午後しかありませんね。",
+        "translation": "所有人都聚得起来的就只有周五下午了。"
+    },
+    {
+        "grammar": "～しかない",
+        "sentence": "天候不順で、山頂まで行くのはあきらめるほかない。",
+        "translation": "天气反常，只能放弃爬到山顶了。"
+    },
+    {
+        "grammar": "～しかない",
+        "sentence": "薬では治せないから、手術するほかない。",
+        "translation": "吃药治不好，所以只能做手术了。"
+    },
+    {
+        "grammar": "～しかない",
+        "sentence": "高層ビル建設に対する住民の反対運動が続いている。計画を変更するほかな",
+        "translation": "反对建造高楼的居民运动一直在持续。只能改变计划了。"
+    },
+    {
+        "grammar": "～からこそ",
+        "sentence": "大変なときだからこそ、協力することが大切なんです。",
+        "translation": "正因为是困难的时候，提供帮助才更加重要。"
+    },
+    {
+        "grammar": "～からこそ",
+        "sentence": "いろいろな国の人たちと交流できたのは留学したからこそだと思います。",
+        "translation": "我觉得，能够和各国的人进行交流，正是因为我曾经留学过。"
+    },
+    {
+        "grammar": "～からこそ",
+        "sentence": "人生は思い通りにいかないことが多いですが、だからこそおもしろいんですよ。",
+        "translation": "人生很多事情不能如愿，正因为这样才有意思啊。"
+    },
+    {
+        "grammar": "～なんか",
+        "sentence": "テレビなんかなくても、パソコンがあれば困らない。",
+        "translation": "就算没有电视，有电脑就没问题了。"
+    },
+    {
+        "grammar": "～なんか",
+        "sentence": "私は仕事が恋人だから結婚なんかしない。",
+        "translation": "工作是我的男朋友，我才不想结什么婚呢。"
+    },
+    {
+        "grammar": "～なんか",
+        "sentence": "N3なんか、ちゃんと準備すれば簡単だよ。",
+        "translation": "不就是N3吗，好好准备的话，是很容易的。"
+    },
+    {
+        "grammar": "～なんか",
+        "sentence": "バドミントンなんてだれでもできると思ったんですが、やってみるとかなりはげ",
+        "translation": "以前我以为羽毛球是人就会打，结果试着打了打，发现这是一个相当激烈的运动。"
+    },
+    {
+        "grammar": "～なんか",
+        "sentence": "お宅のワンちゃん、いい子ですね。 うちの犬なんて、ぜんぜん私の言うことを",
+        "translation": "你们家的小狗真乖，我们家的一点儿都不听我的话呢。"
+    },
+    {
+        "grammar": "～なんか",
+        "sentence": "私なんかにできるわけがない。",
+        "translation": "我这种人根本做不到。"
+    },
+    {
+        "grammar": "～っこない",
+        "sentence": "30年後、自分がどこで何をしているかはだれにもわかりっこない。",
+        "translation": "没有人知道自己30年之后会在哪里做什么。"
+    },
+    {
+        "grammar": "～っこない",
+        "sentence": "課長、今からがんばっても明日の納品には間に合いっこないですよ。",
+        "translation": "课长，就算现在开始拼命做，也来不及明天交货啊。"
+    },
+    {
+        "grammar": "～っこない",
+        "sentence": "いくらおすしが好きでも、50皿も一度に食べられっこないよ。",
+        "translation": "再怎么喜欢吃寿司，也不可能一次吃掉50碟啊。"
+    },
+    {
+        "grammar": "～からといって",
+        "sentence": "買い物は計画的に。安いからといって、買いすぎないようにしましょう。",
+        "translation": "购物要有计划性。不要因为便宜就买多了。"
+    },
+    {
+        "grammar": "～からといって",
+        "sentence": "便利だからといって、インターネットに頼ってばかりいると、困ることがあるよ。",
+        "translation": "因为方便就一味地依赖网络，有时候会很伤脑筋的。"
+    },
+    {
+        "grammar": "～からといって",
+        "sentence": "運動は必要ですが、だからといって、やりすぎてはいけません。",
+        "translation": "运动是有必要的，但也不能因为这样就运动过度了。"
+    },
+    {
+        "grammar": "～とは限らない",
+        "sentence": "最近、バレンタインデーに贈るものはチョコレートとは限らないそうです。",
+        "translation": "听说最近情人节礼物不局限于巧克力了。"
+    },
+    {
+        "grammar": "～とは限らない",
+        "sentence": "大企業だからといって、倒産しないとは限らない。",
+        "translation": "就算是大企业，也未必不会破产。"
+    },
+    {
+        "grammar": "～とは限らない",
+        "sentence": "駅の近くなら通勤に便利だとは限りません。急行が止まらない駅は意外に不便で",
+        "translation": "在地铁站附近也不一定上班就方便。如果快车在那站不停，反而就不方便了。"
+    },
+    {
+        "grammar": "～とは限らない",
+        "sentence": "デジカメは機能が多くても使いやすいとは限りません。ニーズに合わせてお選び",
+        "translation": "数码相机功能再多也不一定就好用。请您根据自己的需要进行选择。"
+    },
+    {
+        "grammar": "～ことといったら",
+        "sentence": "花見の客の多いことといったら、ゆっくり桜も見られないほどでしたよ。",
+        "translation": "要说赏花的游客之多，多到连慢慢地看都不行呢。"
+    },
+    {
+        "grammar": "～ことといったら",
+        "sentence": "あの店の店員の態度のひどいことといったら……。もう二度と行きたくない。",
+        "translation": "说起那家店的店员恶劣的态度…我再也不想去那家店了。"
+    },
+    {
+        "grammar": "～ことといったら",
+        "sentence": "沖縄の海の青さといったら、まるで映画のワンシーンを見ているようでした。",
+        "translation": "冲绳的海，蓝得简直就像是在看电影画面一样。"
+    },
+    {
+        "grammar": "～ことといったら",
+        "sentence": "富士山の美しさといったら、言葉にできない。",
+        "translation": "说到富士山的美，真是难以言表。"
+    },
+    {
+        "grammar": "～くせに",
+        "sentence": "「今すぐ行きます」って言ったくせに、1時間たっても来ない。",
+        "translation": "说“马上就来”，都过了1个小时了还没有来。"
+    },
+    {
+        "grammar": "～くせに",
+        "sentence": "山田って、本当は彼女が好きなくせに、いつも彼女に意地悪を言うんだよ。",
+        "translation": "山田其实是喜欢她的，却总是刁难她。"
+    },
+    {
+        "grammar": "～くせに",
+        "sentence": "木村さんは文句ばかり言う。そのくせ何もしない。",
+        "translation": "木村就知道抱怨，却什么都不做。"
+    },
+    {
+        "grammar": "～くせに",
+        "sentence": "何も知らないくせに、えらそうに話す。",
+        "translation": "明明什么都不知道，却摆出一副了不起的样子。"
+    },
+    {
+        "grammar": "～くせに",
+        "sentence": "含有轻视、轻蔑的语气；「のに」表示出乎前项预料的情况（积极和消极均可）,",
+        "translation": "除了含有不满、责怪的意思之外，有时还含有惋惜、同情、遗憾等意思。有些句子"
+    },
+    {
+        "grammar": "～くせに",
+        "sentence": "あの人は金持ちなのに、お金を使わない。 （并没有批判、轻蔑的语气，更多的",
+        "translation": "是意外等）"
+    },
+    {
+        "grammar": "～っぽい",
+        "sentence": "いつも黒っぽい服を着ているね。明るい色は嫌いなの?",
+        "translation": "你总是穿着黑色系的衣服，是不喜欢亮的颜色吗?"
+    },
+    {
+        "grammar": "～っぽい",
+        "sentence": "ヘアスタイルをちょっと変えるだけで、ずいぶん大人っぽい印象になりますよ。",
+        "translation": "只要稍微改变一下发型，就能给人留下非常稳重的印象哦。"
+    },
+    {
+        "grammar": "～っぽい",
+        "sentence": "課長は怒りっぽくて、すぐ怒るくせにすぐだれる。",
+        "translation": "课长动不动就生气，不过发火发得快，忘得也快。"
+    },
+    {
+        "grammar": "～っぽい",
+        "sentence": "君は忘れっぽいんだから、いつもメモを取るようにしなさい。",
+        "translation": "你很健忘，平时要养成做笔记的习惯。"
+    },
+    {
+        "grammar": "～っぽい",
+        "sentence": "あきっぽい人でも、この方法なら楽しみながら練習できるので長続きします",
+        "translation": "就算是三天打鱼两天晒网的人，用这个方法可以边玩边练习，这样就能坚持下来"
+    },
+    {
+        "grammar": "～っぽい",
+        "sentence": "このコート、まだ新しいのに古着っぽい。",
+        "translation": "这件大衣明明是新的，却很像旧衣服。"
+    },
+    {
+        "grammar": "～せい",
+        "sentence": "連日の暑さのせいで、庭の花が全部枯れてしまった。",
+        "translation": "都怪连日来的酷暑，院子里的花全都枯了。"
+    },
+    {
+        "grammar": "～せい",
+        "sentence": "部屋のエアコンが古いせいで、音がうるさくてよく寝られない。",
+        "translation": "房间里的空调太旧了，声音太吵，害得人睡不好觉。"
+    },
+    {
+        "grammar": "～せい",
+        "sentence": "ごめん。ぼくのせいで君にまで迷惑かけちゃって。",
+        "translation": "对不起，因为我，连你都被牵连了。"
+    },
+    {
+        "grammar": "～せい",
+        "sentence": "舞台の本番前で、緊張しているせいか、すごくのどがかわく。",
+        "translation": "正式演出之前，或许是因为紧张吧，口非常渴。"
+    },
+    {
+        "grammar": "～せい",
+        "sentence": "気のせいか、駅前のパン屋のパンが小さくなったような気がする。",
+        "translation": "可能是我的心理作用，感觉地铁站前面那家面包店的面包变小了。"
+    },
+    {
+        "grammar": "～ことだから",
+        "sentence": "鈴木選手のことだから、本番ではさらにすばらしい演技を見せてくれるでしょう。",
+        "translation": "因为是铃木选手，他一定能在正式比赛时发挥得更加完美的。"
+    },
+    {
+        "grammar": "～ことだから",
+        "sentence": "御社のことですから、今までにないまったく新しいタイプの製品を作ってくきな",
+        "translation": "因为是贵公司，所以我们非常期待能够制作出前所未有的新款产品。"
+    },
+    {
+        "grammar": "～気味",
+        "sentence": "このところ残業続きで、寝不足気味だから、今日は早く帰るよ。",
+        "translation": "这段时间连续加班，有点睡眠不足，我今天早点回家。"
+    },
+    {
+        "grammar": "～気味",
+        "sentence": "4月になっても寒い日が続いていて、桜の開花も例年より遅れ気味だとのことです。",
+        "translation": "都4月份了，还一直很冷，据说樱花开花也比往年要晚一些。"
+    },
+    {
+        "grammar": "～気味",
+        "sentence": "夏バテ気味の方には、野菜がたっぷり入ったこの冷たいうどんがおすすめです。",
+        "translation": "有点苦夏的人，建议吃这种冷乌冬面，里面有很多蔬菜。"
+    },
+    {
+        "grammar": "～気味",
+        "sentence": "経済政策の効果が表れず、大統領の支持率が下がり気味だ。",
+        "translation": "经济政策的效果没有显现，总统的支持率有点下降。"
+    },
+    {
+        "grammar": "～なんか～ない",
+        "sentence": "泣いてなんかいません。目にゴミが入っただけです。",
+        "translation": "我才没有哭，只是眼睛里进东西了。"
+    },
+    {
+        "grammar": "～なんか～ない",
+        "sentence": "年末は忙しくて、のんびり昼ご飯を食べてなんかいられないんです。",
+        "translation": "年末太忙了，连悠悠闲闲地吃顿午饭都不行。"
+    },
+    {
+        "grammar": "～なんか～ない",
+        "sentence": "そんな話、信じられなんかしない。",
+        "translation": "那种话，我才不会信呢。"
+    },
+    {
+        "grammar": "～さえ",
+        "sentence": "来週から出張に行くのに、ホテルの予約はもちろん、航空券の予約さえしてない。",
+        "translation": "下周就要出差了，可是别说预订宾馆了，连机票都没有买。"
+    },
+    {
+        "grammar": "～さえ",
+        "sentence": "ボクサーは試合の計量前には水さえ飲まないで、減量するそうです。",
+        "translation": "听说，拳击手比赛量体重之前，连水都不喝，要减轻体重。"
+    },
+    {
+        "grammar": "～さえ",
+        "sentence": "母は転んで両手を骨折して、一人で食事することさえできなくなった。",
+        "translation": "妈妈摔跤了，双手骨折，连自己吃饭都吃不了。"
+    },
+    {
+        "grammar": "～さえ",
+        "sentence": "リンさんは友だちにさえ何も言わずに急に帰国してしまった。どうしたんだろう。",
+        "translation": "小林连朋友都不告诉，突然就回国了。怎么回事啊?"
+    },
+    {
+        "grammar": "～さえ",
+        "sentence": "あの山は、ベテランの登山家でさえ簡単には登れない山だ。",
+        "translation": "那座山，连专业登山家都轻易爬不上去。"
+    },
+    {
+        "grammar": "～さえ",
+        "sentence": "加藤さんはあさってまでにレポートを書かなければならないのに、まだ資料を集",
+        "translation": "加藤后天之前就得写完论文，却连资料都还没有收集。"
+    },
+    {
+        "grammar": "～さえ",
+        "sentence": "彼は自分がだまされたことに気づいてさえいないらしいね。",
+        "translation": "他好像都还没有发现自己被骗了。"
+    },
+    {
+        "grammar": "～さえ",
+        "sentence": "忙しすぎて昼ご飯さえ食べられなかった。",
+        "translation": "太忙了，连午饭都顾不上吃。"
+    },
+    {
+        "grammar": "～くらい",
+        "sentence": "昨日の地震は、座っていられないくらい強くゆれた。",
+        "translation": "昨天的地震，震感太强烈了，坐都坐不住。"
+    },
+    {
+        "grammar": "～くらい",
+        "sentence": "この前のテストは自分でもおどろくくらいよくできました。",
+        "translation": "上次考试成绩好得连我自己都吓了一跳。"
+    },
+    {
+        "grammar": "～くらい",
+        "sentence": "緊張して、食事ものどを通らないくらいだった。",
+        "translation": "紧张得连饭都吞不下去了。"
+    },
+    {
+        "grammar": "～くらい",
+        "sentence": "かっこいいくつを見つけて値札を見たら、目が飛び出るくらい高くておどろいた。",
+        "translation": "我看见一双特别酷的鞋子，但一看价签，吓得眼珠子都要跳出来了，太贵了。"
+    },
+    {
+        "grammar": "～くらい",
+        "sentence": "なAな/N +くらい",
+        "translation": "意味：程度，可以是最高程度也可以是最低程度"
+    },
+    {
+        "grammar": "～くらい",
+        "sentence": "手，握得好痛)”。也表示“最低限度也得”，如“そうじくらい手伝って(至少帮忙",
+        "translation": "打扫一下)”。"
+    },
+    {
+        "grammar": "～ぱなし",
+        "sentence": "自転車を駅前に置きっぱなしにしたら、持っていかれてしまった。",
+        "translation": "我把自行车停在地铁站前面，没骑回来，结果被人偷走了。"
+    },
+    {
+        "grammar": "～ぱなし",
+        "sentence": "私はよく部屋の電気をつけっぱなしにして、母に注意される。",
+        "translation": "我老是不关房间的灯，总挨妈妈说。"
+    },
+    {
+        "grammar": "～ぱなし",
+        "sentence": "旅行の間、1週間も部屋を閉めっぱなしだったから、空気を入れかえよう。",
+        "translation": "旅行期间，房门窗门紧闭了一整周，快打开换换气吧。"
+    },
+    {
+        "grammar": "～ぱなし",
+        "sentence": "田中さんは、もう1時間もカラオケで歌いっぱなしだ。",
+        "translation": "田中已经在 KTV 唱了快一个小时了。"
+    },
+    {
+        "grammar": "～ぱなし",
+        "sentence": "今日は、ミスばかりで、先輩にしかられっぱなしだった",
+        "translation": "今天总是犯错，老挨前辈责骂。"
+    },
+    {
+        "grammar": "～だらけ",
+        "sentence": "雨の日にサッカーの試合をしたので、ユニフォームもくつも泥だらけになった。",
+        "translation": "下雨天踢足球比赛，球服、球鞋都沾满了泥水。"
+    },
+    {
+        "grammar": "～だらけ",
+        "sentence": "冷蔵庫の奥からカビだらけのチーズが出てきた。",
+        "translation": "冰箱深处发现了一块整个发了霉的奶酪。"
+    },
+    {
+        "grammar": "～だらけ",
+        "sentence": "犬を家の中で飼っていて、部屋がすぐ毛だらけになるのでそうじが大変なんです。",
+        "translation": "在家里养狗，很快就到处都是毛了，打扫卫生可费劲了。"
+    },
+    {
+        "grammar": "～だらけ",
+        "sentence": "医学的に見たら、間違いだらけのダイエット方法が多いらしい。",
+        "translation": "听说从医学上看，很多减肥方法都一无是处。"
+    },
+    {
+        "grammar": "～たりして",
+        "sentence": "彼女、急に泣いたりして、どうしたんだろう?",
+        "translation": "她突然间哭了起来，发生什么事了?"
+    },
+    {
+        "grammar": "～たりして",
+        "sentence": "バスの窓から手を出したりしてはいけませんよ。",
+        "translation": "不可以把手伸出车窗哦。"
+    },
+    {
+        "grammar": "～たりして",
+        "sentence": "ここは図書館ですから、大きい声で話したりしないでください。",
+        "translation": "这里是图书馆，所以请不要大声说话。"
+    },
+    {
+        "grammar": "N＋らしい",
+        "sentence": "桜が咲いて春らしい季節になりました。",
+        "translation": "樱花开了, 像是春天了。"
+    },
+    {
+        "grammar": "N＋らしい",
+        "sentence": "今年就職した息子は、やっと最近社会人らしくなってきた。",
+        "translation": "儿子今年上班了，最近终于像个社会人了。"
+    },
+    {
+        "grammar": "N＋らしい",
+        "sentence": "ぼくは子どものころ、泣くといつも祖父に「男らしくないぞ」と怒られた。",
+        "translation": "我小时候，一哭就被祖父骂：“不像个男子汉！”"
+    },
+    {
+        "grammar": "N＋らしい",
+        "sentence": "的要求，出差地大概是北海道。），此时无法与いかにも、とても等副词一起使用，",
+        "translation": "表示“典型特征”时无此限制。"
+    },
+    {
+        "grammar": "～かと思った",
+        "sentence": "100点取って、先生に呼ばれたから、ほめられるかと思ったら、遅刻が多いと注",
+        "translation": "考了100分之后，被老师叫去，还以为是表扬我呢，结果是警告我太经常迟到了。"
+    },
+    {
+        "grammar": "～かと思った",
+        "sentence": "10キロも走らされて、死ぬかと思ったよ。",
+        "translation": "被迫跑了10公里，感觉都要死了。"
+    },
+    {
+        "grammar": "～とか～とか",
+        "sentence": "私の学校では数学とか物理とか、理科系の科目の時間数が多くて、いい先生がた",
+        "translation": "我们学校数学、物理等理科的课时多，有好多好老师。"
+    },
+    {
+        "grammar": "～とか～とか",
+        "sentence": "出席率のいい学生は、獎学金がもらえるとか学費が安くなるとかいろいろなメリ",
+        "translation": "有的学校，出勤率高的学生会得到许多奖励，比如获得奖学金或者减免学费等等。"
+    },
+    {
+        "grammar": "～とか～とか",
+        "sentence": "進路を決めるのは大切なことだから、いろいろ調べるとか先輩に相談するとかし",
+        "translation": "决定毕业去向是非常重要的事情，最好多做调查或者问问师兄师姐们。"
+    },
+    {
+        "grammar": "～とか～とか",
+        "sentence": "私はスポーツを見るのが大好きで、野球とかよく見に行きます。",
+        "translation": "我非常喜欢观看体育运动，经常去看棒球等等。"
+    },
+    {
+        "grammar": "～とか～とか",
+        "sentence": "日本にはスキーができるところがたくさんありますよ。長野県とか……",
+        "translation": "日本有很多可以滑雪的地方，比如长野县等等。"
+    },
+    {
+        "grammar": "～ついでに",
+        "sentence": "薬局へ薬を買いに行ったついでに、 トイレットペーパーも買ってきた。",
+        "translation": "去药店买药，顺便买了厕纸。"
+    },
+    {
+        "grammar": "～ついでに",
+        "sentence": "買い物のついでに、前から一度行ってみたかったカフェに寄ったが、期待したほ",
+        "translation": "买东西的时候，顺便去了那家之前就想去看一下的咖啡店，发现没有期待的好。"
+    },
+    {
+        "grammar": "～に違いない",
+        "sentence": "この絵をかくのに何百時間もかかったに違いないと思う。",
+        "translation": "人们都很期待，在不远的将来，宇宙旅行一定能变得非常普遍。"
+    },
+    {
+        "grammar": "～に違いない",
+        "sentence": "田中選手は優勝するに違いないと言われていたが、2位に終わってしまった。",
+        "translation": "大家都说田中运动员一定能夺冠，结果止步亚军。"
+    },
+    {
+        "grammar": "～に違いない",
+        "sentence": "今後も少子化の傾向は続いていくに違いありません。早急な対策が望まれます。",
+        "translation": "今后，少子化趋势一定会持续，希望能尽早拿出对策。"
+    },
+    {
+        "grammar": "～に違いない",
+        "sentence": "黒い服の男がうちの玄関を開けようとしていた。あの男は泥棒に違いない。",
+        "translation": "一个穿着黑衣服的男人正要开我们家的大门。他一定是小偷。"
+    },
+    {
+        "grammar": "～に違いない",
+        "sentence": "今回の企業買収には裏で大物政治家の力が働いていたに相違ないとうわさされ",
+        "translation": "传闻说，这次企业并购的背后， 一定有重量级政治家的势力在发挥作用。"
+    },
+    {
+        "grammar": "～に違いない",
+        "sentence": "この建物は200年以上前に作られたものに相違ないと専門家は話している。",
+        "translation": "专家说，这栋建筑物肯定是200多年前建造的。"
+    },
+    {
+        "grammar": "～ほど～ない",
+        "sentence": "夏は毎年暑いけど、今年ほど暑い夏はないんじゃないかなあ。",
+        "translation": "每年夏天都很热，但应该没有哪一年能比今年热的了。"
+    },
+    {
+        "grammar": "～ほど～ない",
+        "sentence": "病人にとって家族や友人の励ましほど、力になるものはないんですよ。",
+        "translation": "对于病人来说，亲人朋友的鼓励才是最能给他力量的东西。"
+    },
+    {
+        "grammar": "～ほど～ない",
+        "sentence": "海外旅行から帰って、やっぱり自分の国ほど住みやすいところはないと実感した。",
+        "translation": "从国外旅游回来，切身感觉到，果然还是自己的国家住得最舒服。"
+    },
+    {
+        "grammar": "～ほど～ない",
+        "sentence": "音楽ほど心を癒やすものはない。",
+        "translation": "没有什么比音乐更能治愈心灵。"
+    },
+    {
+        "grammar": "～ほど～ない",
+        "sentence": "⑤雷が鳴っているときに高い木の下にいることほど危険なことはない。",
+        "translation": "⑤没有比打雷的时候待在大树下更危险的事情了。"
+    },
+    {
+        "grammar": "N+ぬきで",
+        "sentence": "キャプテンがけがをしたので、来週の試合はキャプテンぬきたたかで戦わなけれ",
+        "translation": "队长受伤了，所以下周的比赛不得不在队长缺阵的状态下应战。"
+    },
+    {
+        "grammar": "N+ぬきで",
+        "sentence": "子ども用にわさびぬきでお寿司を作ってもらった。",
+        "translation": "我让师傅做了不加芥末的寿司，专门给小孩吃。"
+    },
+    {
+        "grammar": "N+ぬきで",
+        "sentence": "今日の忘年会は仕事の話ぬきで楽しみましょう。",
+        "translation": "今年尾牙，不谈工作，好好乐一乐。"
+    },
+    {
+        "grammar": "N+ぬきで",
+        "sentence": "高橋さんの講演はお世辞ぬきでとても役に立つお話だった。",
+        "translation": "完全不恭维地说，高桥先生的演讲真的非常有帮助。"
+    },
+    {
+        "grammar": "～でしょうがない",
+        "sentence": "空気が乾燥しているせいか、のどがかわいてしょうがない。",
+        "translation": "可能是因为空气干燥吧，口渴得不行了。"
+    },
+    {
+        "grammar": "～でしょうがない",
+        "sentence": "寝不足だし、昼ご飯を食べたばかりだし……。眠くてしょうがない。",
+        "translation": "睡眠不足，又刚刚吃过午饭⋯ ⋯ 困得不行了。"
+    },
+    {
+        "grammar": "～でしょうがない",
+        "sentence": "前からほしくてしょうがなかったギターがやっと買えた。",
+        "translation": "之前就非常想要的一把吉他，终于买到手了。"
+    },
+    {
+        "grammar": "～でしょうがない",
+        "sentence": "となりの人のヘッドホンから聞こえてくる音が、気になってしかたがないこと",
+        "translation": "旁边的人耳机里传出来的声音，有时候会让人在意得不得了。"
+    },
+    {
+        "grammar": "～でしょうがない",
+        "sentence": "あちこち蚊に刺されて、かゆくてたまらない。",
+        "translation": "到处被蚊子咬的，痒得不行了。"
+    },
+    {
+        "grammar": "～でしょうがない",
+        "sentence": "山田さんは一人暮らしを始めた娘さんの様子が心配でたまらないようだ。",
+        "translation": "山田好像非常担心女儿开始一个人生活。"
+    }
+];
+    // --- End of 语法数据 ---
+
+    let currentQuestion = null;
+    let currentQuestionIndex = 0;
+    let questionHistory = [];
+    let hasChecked = false;
+    let isCurrentCorrect = false;
+    let wrongSet = new Set();
+    let mode = 'all'; // 'all' | 'wrong'
+    let wrongPointer = 0;
+    const totalQuestions = grammarData.length;
+
+    function loadProgress() {
+        try {
+            const saved = parseInt(localStorage.getItem('try_n3_progress_index'), 10);
+            if (!isNaN(saved) && saved >= 0 && saved < totalQuestions) {
+                currentQuestionIndex = saved; // zero-based pointer
+            }
+            const wrongRaw = localStorage.getItem('try_n3_wrong_indices');
+            if (wrongRaw) {
+                const arr = JSON.parse(wrongRaw);
+                if (Array.isArray(arr)) wrongSet = new Set(arr);
+            }
+            const savedMode = localStorage.getItem('try_n3_mode');
+            if (savedMode === 'wrong' || savedMode === 'all') {
+                mode = savedMode;
+            }
+            const savedWrongPtr = parseInt(localStorage.getItem('try_n3_wrong_ptr'), 10);
+            if (!isNaN(savedWrongPtr)) wrongPointer = savedWrongPtr;
+        } catch (e) {
+            console.warn('progress load failed', e);
+        }
+    }
+
+    function saveProgress() {
+        try {
+            localStorage.setItem('try_n3_progress_index', String(currentQuestionIndex));
+            localStorage.setItem('try_n3_wrong_indices', JSON.stringify(Array.from(wrongSet)));
+            localStorage.setItem('try_n3_mode', mode);
+            localStorage.setItem('try_n3_wrong_ptr', String(wrongPointer));
+        } catch (e) {
+            console.warn('progress save failed', e);
+        }
+    }
+
+    function updateProgressUI() {
+        const done = Math.min(currentQuestionIndex, totalQuestions);
+        const pct = totalQuestions > 0 ? (done / totalQuestions) * 100 : 0;
+        if (progressLabel) progressLabel.textContent = `${done}/${totalQuestions}`;
+        if (progressBar) progressBar.style.width = `${pct}%`;
+    }
+
+    function updateModeUI() {
+        if (wrongCountDisplay) wrongCountDisplay.textContent = wrongSet.size;
+        if (modeLabel) modeLabel.textContent = mode === 'wrong' ? '错题模式' : '全题模式';
+    }
+
+    function getWrongList() {
+        return Array.from(wrongSet);
+    }
+
+    // Strip end-of-sentence punctuation so it never becomes a sortable chip
+    function stripEndingPunctuation(sentence) {
+        // Remove common full/half width sentence-ending marks: 。 ． ｡ . ? !
+        return sentence.replace(/[\s\u3002\uFF0E\uFF61\.\?\!]+$/, '').trim();
+    }
+
+
+
+    // --- Speech (Web Speech API) ---
+    let preferredVoice = null;
+
+    function pickVoice() {
+        if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null;
+        const voices = window.speechSynthesis.getVoices() || [];
+        const ja = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ja'));
+        const zh = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('zh'));
+        return ja || zh || voices[0] || null;
+    }
+
+    function speakText(text) {
+        if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+            console.warn('speech synthesis not supported');
+            return;
+        }
+        if (!preferredVoice) preferredVoice = pickVoice();
+        const utterance = new SpeechSynthesisUtterance(text);
+        if (preferredVoice) utterance.voice = preferredVoice;
+        utterance.lang = (preferredVoice && preferredVoice.lang) || 'ja-JP';
+        utterance.rate = 1;
+        utterance.pitch = 1;
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utterance);
+    }
+
+    window.speechSynthesis && (window.speechSynthesis.onvoiceschanged = () => {
+        preferredVoice = pickVoice();
+    });
+
+    function attachSpeechToChip(chip) {
+        // 双击发音（桌面）
+        chip.addEventListener('dblclick', (e) => {
+            e.stopPropagation();
+            const text = chip.textContent.trim();
+            if (text) speakText(text);
+        });
+
+        // 长按发音（移动端友好）
+        let pressTimer = null;
+        const startHold = () => {
+            if (pressTimer) clearTimeout(pressTimer);
+            pressTimer = setTimeout(() => {
+                const text = chip.textContent.trim();
+                if (text) speakText(text);
+            }, 500); // 长按 500ms 触发
+        };
+        const cancelHold = () => {
+            if (pressTimer) {
+                clearTimeout(pressTimer);
+                pressTimer = null;
+            }
+        };
+        chip.addEventListener('touchstart', startHold, { passive: true });
+        chip.addEventListener('touchend', cancelHold);
+        chip.addEventListener('touchcancel', cancelHold);
+        chip.addEventListener('mousedown', startHold);
+        chip.addEventListener('mouseup', cancelHold);
+        chip.addEventListener('mouseleave', cancelHold);
+    }
+
+    // 作答区拖拽排序支持
+    let draggingIndex = null;
+    function enableAnswerDrag(chip) {
+        chip.draggable = true;
+        chip.addEventListener('dragstart', (e) => {
+            draggingIndex = Array.from(answerArea.children).indexOf(chip);
+            e.dataTransfer.effectAllowed = 'move';
+        });
+    }
+
+    function disableAnswerDrag(chip) {
+        chip.draggable = false;
+        draggingIndex = null;
+    }
+    const shuffledArea = document.getElementById('shuffled-sentence');
+    const answerArea = document.getElementById('answer-area');
+    const grammarDisplay = document.getElementById('current-grammar');
+    const translationHint = document.getElementById('translation-hint');
+    const questionNumberDisplay = document.getElementById('question-number');
+    const wrongCountDisplay = document.getElementById('wrong-count');
+    const modeLabel = document.getElementById('mode-label');
+    const wrongModeButton = document.getElementById('wrong-mode-button');
+    const allModeButton = document.getElementById('all-mode-button');
+    const resultArea = document.getElementById('result-area');
+    const resultMessage = document.getElementById('result-message');
+    const correctJapanese = document.getElementById('correct-japanese');
+    const correctChinese = document.getElementById('correct-chinese');
+    const checkButton = document.getElementById('check-button');
+    const nextButton = document.getElementById('next-button');
+    const resetButton = document.getElementById('reset-button');
+    const progressResetButton = document.getElementById('progress-reset-button');
+    answerArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    });
+    answerArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (draggingIndex === null) return;
+        const chips = Array.from(answerArea.children);
+        const targetChip = e.target.closest('.answer-chip');
+        let targetIndex = chips.indexOf(targetChip);
+        if (targetIndex === -1) targetIndex = chips.length - 1;
+        const movingChip = chips[draggingIndex];
+        if (!movingChip) return;
+        if (draggingIndex < targetIndex) {
+            targetChip ? targetChip.after(movingChip) : answerArea.appendChild(movingChip);
+        } else if (draggingIndex > targetIndex) {
+            targetChip ? answerArea.insertBefore(movingChip, targetChip) : answerArea.appendChild(movingChip);
+        }
+        draggingIndex = null;
+    });
+    const progressBar = document.getElementById('progress-bar');
+    const progressLabel = document.getElementById('progress-label');
+
+    // 句子分词函数 (最终优化版: 确保移除句末标点)
+    function segmentSentence(sentence, grammarPoint = "") {
+        // 1. 强制性去除句末标点 (Suggestion 1)
+        let cleanedSentence = stripEndingPunctuation(sentence);
+
+        // �����ȡ� grammar �е��̶�片��ǰ�����
+        const grammarFixedParts = getGrammarFixedParts(grammarPoint);
+        grammarFixedParts.forEach(part => {
+            if (!part) return;
+            const esc = part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            cleanedSentence = cleanedSentence.replace(new RegExp(esc, 'g'), ` ${part} `);
+        });
+
+        // 2. 改进分词逻辑 (减小拆分范围，主要在核心助词/连词分割)
+        const saferDelimiters = /(は|が|を|に|で|へ|から|まで|より|そして|しかし|だから|なので|ながら|と|も|よ|ね|たり|つつ|つつも|ばかりか|だけでなく)/g;
+
+        // 在分隔符前后加上空格
+        let spacedSentence = cleanedSentence.replace(saferDelimiters, ' $1 ');
+        
+        // 去除连续空格并按空格拆分
+        const tokens = spacedSentence
+            .replace(/[、，,]/g, ' $& ')
+            .replace(/\s+/g, ' ')
+            .split(' ')
+            .map(t => t.trim())
+            .filter(t => t.length > 0);
+
+        // 根据语法点预先计算需合并的固定片段
+        function getGrammarFixedParts(gp) {
+            if (!gp) return [];
+            const norm = gp.replace(/\s+/g, '');
+            const parts = new Set();
+            const isPlaceholder = (s) => /[A-Za-z0-9]/.test(s);
+
+            // 1) 按 + / ＋ 拆段，再按 〜 拆段
+            norm.split(/[＋+]/).forEach(seg => {
+                seg.split('〜').forEach(s => {
+                    if (s && !isPlaceholder(s)) parts.add(s);
+                });
+            });
+
+            // 2) 整体去掉 〜 的字符串
+            const noTilde = norm.replace(/〜/g, '');
+            if (noTilde && !isPlaceholder(noTilde)) parts.add(noTilde);
+
+            // 3) 捕捉语法点中的日文连续片段（长度>=2）
+            const jpSeq = norm.match(/[一-龥ぁ-んァ-ンー]+/g) || [];
+            jpSeq.forEach(s => {
+                if (s.length >= 2 && !isPlaceholder(s)) parts.add(s);
+                // 若包含“ように”，额外加入“ように”
+                if (s.includes('ように')) parts.add('ように');
+            });
+
+            return Array.from(parts);
+        }
+
+        // Merge rules
+        const mergedTokens = [];
+        for (let i = 0; i < tokens.length; i++) {
+            const current = tokens[i];
+            const next = tokens[i + 1];
+
+            // Attach comma-like tokens to the previous chip so they don't stand alone
+            if ((current === '、' || current === '，' || current === ',') && mergedTokens.length > 0) {
+                mergedTokens[mergedTokens.length - 1] += current;
+                continue;
+            }
+
+            // Keep 「ところ」 as一个词块
+            if (current === 'と' && next === 'ころ') {
+                mergedTokens.push('ところ');
+                i++;
+                continue;
+            }
+
+            // Keep 「きっと」 as一个词块（避免切成「きっ」「と」）
+            if (current === 'きっ' && next === 'と') {
+                mergedTokens.push('きっと');
+                i++;
+                continue;
+            }
+
+            // Keep 「ので」作为因果连词
+            if (current === 'の' && next === 'で') {
+                mergedTokens.push('ので');
+                i++;
+                continue;
+            }
+
+            // Keep 「もう」作为副词
+            if (current === 'も' && next === 'う') {
+                mergedTokens.push('もう');
+                i++;
+                continue;
+            }
+
+            // Merge 动词て/で形（如 住ん+で → 住んで）
+            if ((next === 'で' || next === 'て') && /[ぁ-ゟァ-ヿ一-龯]$/.test(current)) {
+                mergedTokens.push(current + next);
+                i++;
+                continue;
+            }
+
+            // Keep よく as一个词块
+            if (current === 'よ' && next === 'く') {
+                mergedTokens.push('よく');
+                i++;
+                continue;
+            }
+
+            // grammar-based longest match
+            let matched = false;
+            for (const part of grammarFixedParts) {
+                let concat = current;
+                let end = i;
+                while (end + 1 < tokens.length && concat.length < part.length) {
+                    const candidate = concat + tokens[end + 1];
+                    if (part.startsWith(candidate)) {
+                        end += 1;
+                        concat = candidate;
+                        if (concat === part) break;
+                    } else {
+                        break;
+                    }
+                }
+                if (concat === part) {
+                    mergedTokens.push(part);
+                    i = end;
+                    matched = true;
+                    break;
+                }
+            }
+            if (matched) continue;
+
+            if (current === 'の' && next === 'は') {
+                mergedTokens.push('のは');
+                i++;
+                continue;
+            }
+
+            if (current.endsWith('の') && next === 'は') {
+                mergedTokens.push(current + 'は');
+                i++;
+                continue;
+            }
+
+            if (current === 'で' && next === 'す' && i >= tokens.length - 2) {
+                mergedTokens.push('です');
+                i++;
+                continue;
+            }
+
+            if (current === 'も' && next && next.startsWith('らえ')) {
+                mergedTokens.push('も' + next);
+                i++;
+                continue;
+            }
+
+            // ように / ように言う / ようにする 系的合并
+            if ((current === 'よう' && next === 'に') || current === 'ように') {
+                let merged = 'ように';
+                if (current === 'よう' && next === 'に') {
+                    i++; // consume に
+                }
+                const following = tokens[i + 1];
+                if (following && (following.startsWith('言') || following.startsWith('す'))) {
+                    merged += following;
+                    i++;
+                }
+                mergedTokens.push(merged);
+                continue;
+            }
+
+            if (current === 'ように' && next && (next.startsWith('言') || next.startsWith('す'))) {
+                mergedTokens.push(current + next);
+                i++;
+                continue;
+            }
+
+            mergedTokens.push(current);
+        }
+
+        return mergedTokens;
+    }
+
+// 洗牌算法
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    // 生成新的题目
+    function generateQuestion(advance = true) {
+        if (advance) {
+            currentQuestionIndex = (currentQuestionIndex + 1) % grammarData.length;
+        }
+
+        const dataIndex = currentQuestionIndex % grammarData.length;
+        currentQuestion = grammarData[dataIndex];
+        
+        questionHistory.push(currentQuestion.sentence);
+        
+        questionNumberDisplay.textContent = currentQuestionIndex + 1;
+        grammarDisplay.textContent = currentQuestion.grammar;
+        if (translationHint) translationHint.textContent = currentQuestion.translation || '';
+        updateProgressUI();
+        saveProgress();
+        hasChecked = false;
+        isCurrentCorrect = false;
+        
+        const correctOrder = segmentSentence(currentQuestion.sentence, currentQuestion.grammar);
+        const shuffledOrder = shuffle([...correctOrder]);
+
+        shuffledArea.innerHTML = '';
+        answerArea.innerHTML = '';
+        resultArea.style.display = 'none';
+        resultArea.className = '';
+        checkButton.style.display = 'inline-block';
+
+        shuffledOrder.forEach((word, index) => {
+            const chip = document.createElement('span');
+            chip.className = 'word-chip';
+            chip.textContent = word;
+            chip.dataset.originalIndex = index;
+            attachSpeechToChip(chip);
+            chip.onclick = () => moveChip(chip, 'to-answer');
+            shuffledArea.appendChild(chip);
+        });
+    }
+
+    // 移动词块
+    function moveChip(chip, direction) {
+        if (checkButton.style.display === 'none') return;
+
+        if (direction === 'to-answer') {
+            chip.className = 'answer-chip';
+            enableAnswerDrag(chip);
+            chip.onclick = () => moveChip(chip, 'to-shuffled');
+            answerArea.appendChild(chip);
+        } else {
+            chip.className = 'word-chip';
+            disableAnswerDrag(chip);
+            chip.onclick = () => moveChip(chip, 'to-answer');
+            shuffledArea.appendChild(chip);
+        }
+    }
+
+    // 检查答案
+    function checkAnswer() {
+        if (answerArea.children.length === 0) {
+            alert('请先拼好句子再提交！');
+            return;
+        }
+
+        const correctSentence = stripEndingPunctuation(currentQuestion.sentence).replace(/\s+/g, '');
+        const userSentence = Array.from(answerArea.children)
+            .map(chip => chip.textContent.trim())
+            .join('')
+            .replace(/\s+/g, '');
+
+        resultArea.style.display = 'block';
+        checkButton.style.display = 'none';
+
+        correctJapanese.textContent = stripEndingPunctuation(currentQuestion.sentence);
+        correctChinese.textContent = currentQuestion.translation;
+
+        if (userSentence === correctSentence) {
+            resultMessage.textContent = '正确! 你的拼句全部正确';
+            resultArea.className = 'correct';
+            isCurrentCorrect = true;
+            if (wrongSet.has(currentQuestionIndex)) {
+                wrongSet.delete(currentQuestionIndex);
+                if (mode === 'wrong' && wrongSet.size === 0) {
+                    alert('错题本已清空，返回全题模式');
+                    mode = 'all';
+                    wrongPointer = 0;
+                }
+                saveProgress();
+            }
+        } else {
+            resultMessage.textContent = '错误! 看看正确答案吧。';
+            resultArea.className = '';
+            isCurrentCorrect = false;
+            if (!wrongSet.has(currentQuestionIndex)) {
+                wrongSet.add(currentQuestionIndex);
+                saveProgress();
+            }
+        }
+        hasChecked = true;
+
+        Array.from(shuffledArea.children).forEach(chip => chip.onclick = null);
+        Array.from(answerArea.children).forEach(chip => chip.onclick = null);
+    }
+
+    function resetSentence() {
+        // 重新洗牌当前题，不切换题号
+        generateQuestion(false);
+        resultArea.style.display = 'none';
+        resultArea.className = '';
+        checkButton.style.display = 'inline-block';
+        hasChecked = false;
+        isCurrentCorrect = false;
+    }
+
+    function resetProgress() {
+        currentQuestionIndex = 0;
+        questionHistory = [];
+        saveProgress();
+        generateQuestion(false);
+    }
+
+    // 事件监听器
+    checkButton.addEventListener('click', checkAnswer);
+    nextButton.addEventListener('click', () => {
+        if (!hasChecked) {
+            alert('请先检查答案，再进入下一题');
+            return;
+        }
+        if (!isCurrentCorrect) {
+            alert('本题尚未答对，请再尝试一次');
+            return;
+        }
+        generateQuestion();
+    });
+    resetButton.addEventListener('click', resetSentence);
+    progressResetButton.addEventListener('click', resetProgress);
+
+    loadProgress();
+    updateProgressUI();
+
+    // 首次加载
+    generateQuestion(false);
+
+</script>
+
+</body>
+</html>
