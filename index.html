@@ -155,9 +155,6 @@
         .translation-box strong { color: #0ea5e9; margin-right: 6px; }
 
         .hint-text { margin: 4px 0 14px; color: var(--muted); font-size: 14px; }
-
-    </div>
-
         #question-area { margin-bottom: 14px; }
 
         #shuffled-sentence {
@@ -215,6 +212,12 @@
             text-align: center;
 
             word-break: break-word;
+
+            user-select: none;
+
+            -webkit-user-select: none;
+
+            touch-action: manipulation;
 
         }
 
@@ -276,6 +279,12 @@
 
             word-break: break-word;
 
+            user-select: none;
+
+            -webkit-user-select: none;
+
+            touch-action: manipulation;
+
         }
 
         .answer-chip:hover { background-color: #16a34a; }
@@ -335,6 +344,83 @@
         .progress-bar-wrap { width: 100%; height: 10px; background: #e2e8f0; border-radius: 999px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(15,23,42,0.08); }
 
         .progress-bar { height: 100%; background: linear-gradient(90deg, #22c55e, #0ea5e9); width: 0%; transition: width 0.2s ease; }
+
+        .preferences {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            background: #f8fafc;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            margin: 12px 0;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text);
+            user-select: none;
+        }
+
+        .switch input { display: none; }
+
+        .switch .slider {
+            width: 42px;
+            height: 22px;
+            background: #cbd5e1;
+            border-radius: 999px;
+            position: relative;
+            transition: background-color 0.2s ease;
+        }
+
+        .switch .slider::after {
+            content: '';
+            width: 18px;
+            height: 18px;
+            background: #ffffff;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s ease;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+        }
+
+        .switch input:checked + .slider {
+            background: linear-gradient(90deg, #22c55e, #0ea5e9);
+        }
+
+        .switch input:checked + .slider::after { transform: translateX(20px); }
+
+        .pref-note { color: var(--muted); font-size: 0.92rem; }
+
+        .toast {
+            position: fixed;
+            top: 18px;
+            right: 18px;
+            min-width: 240px;
+            max-width: 320px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(15,23,42,0.18);
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            background: #0ea5e9;
+            color: white;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.success { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .toast.error { background: linear-gradient(135deg, #ef4444, #f97316); }
+        .toast.info { background: linear-gradient(135deg, #0ea5e9, #0284c7); }
 
         /* --- Mobile friendly tweaks --- */
 
@@ -466,9 +552,27 @@
 
     </div>
 
-    <p style="color:#28a745; font-weight: bold; margin-top: 18px;">**V3 最终优化版：已强制移除句末标点，并改进分词逻辑**</p>
+        <div class="preferences" style="margin-top: 16px;">
+
+        <label class="switch">
+
+            <input type="checkbox" id="auto-next-toggle" checked>
+
+            <span class="slider"></span>
+
+            <span>&#31572;&#23545;&#21518;&#33258;&#21160;&#36339;&#21040;&#19979;&#19968;&#39064;</span>
+
+        </label>
+
+        <span class="pref-note">&#40664;&#35748;&#31561;&#24453; 1.2 &#31186;&#65292;&#26041;&#20415;&#20808;&#30475;&#21453;&#39304;&#20877;&#20986;&#39064;</span>
+
+    </div>
+
+<p style="color:#28a745; font-weight: bold; margin-top: 18px;">**V3 最终优化版：已强制移除句末标点，并改进分词逻辑**</p>
 
 </div>
+
+<div id="toast" class="toast"></div>
 
 <script>
 
@@ -1040,17 +1144,7 @@
 
     {
 
-        "grammar": "～させられる",
-
-        "sentence": "来る 来させる 来させられる",
-
-        "translation": "三类动词"
-
-    },
-
-    {
-
-        "grammar": "～がる",
+        "grammar": "～がって",
 
         "sentence": "彼は試合に負けてくやしがっている。",
 
@@ -1060,7 +1154,7 @@
 
     {
 
-        "grammar": "～がる",
+        "grammar": "～がって",
 
         "sentence": "わからない言葉があったら、面倒がらないですぐに調べなさい。",
 
@@ -1070,7 +1164,7 @@
 
     {
 
-        "grammar": "～がる",
+        "grammar": "～がって",
 
         "sentence": "妹は車をほしがっているが、父は絶対許さないと言っている。",
 
@@ -1080,7 +1174,7 @@
 
     {
 
-        "grammar": "～がる",
+        "grammar": "～がって",
 
         "sentence": "田中さんは人気スターのファッションを何でも真似したがる。",
 
@@ -1090,7 +1184,7 @@
 
     {
 
-        "grammar": "～がる",
+        "grammar": "～がって",
 
         "sentence": "寒い日は猫も外へ出たがらない。",
 
@@ -5114,109 +5208,227 @@
 
     // --- End of 语法数据 ---
 
-    let currentQuestion = null;
+    function buildGroupedGrammar(list) {
+        const map = new Map();
+        list.forEach((item, idx) => {
+            if (!map.has(item.grammar)) map.set(item.grammar, []);
+            map.get(item.grammar).push({ ...item, index: idx });
+        });
+        return Array.from(map.entries()).map(([grammar, items]) => ({ grammar, items }));
+    }
 
-    let currentQuestionIndex = 0;
+    const groupedGrammar = buildGroupedGrammar(grammarData);
+    const grammarIndexByKey = groupedGrammar.reduce((acc, g, idx) => {
+        acc[g.grammar] = idx;
+        return acc;
+    }, {});
+
+    let currentQuestion = null;
+    let currentQuestionIndex = 0; // flat index (compatible with wrongSet)
+    let currentGrammarKey = '';
 
     let questionHistory = [];
-
     let hasChecked = false;
-
     let isCurrentCorrect = false;
 
+    let autoNextTimer = null;
+    let toastTimer = null;
+
+    let dailyDate = '';
+    let dailyCount = 0;
+    let totalCompleted = 0;
+
     let wrongSet = new Set();
-
     let mode = 'all'; // 'all' | 'wrong'
-
     let wrongPointer = 0;
 
-    const totalQuestions = grammarData.length;
+    // 轮次状态
+    let grammarCursor = 0;
+    let grammarNextMap = {};
+    let grammarDoneSet = new Set();
+
+    const totalQuestions = grammarData.length; // 总例句数
+
+    function ensureTodayCounters() {
+        const today = new Date().toISOString().slice(0, 10);
+        if (dailyDate !== today) {
+            dailyDate = today;
+            dailyCount = 0;
+        }
+    }
 
     function loadProgress() {
-
         try {
+            const today = new Date().toISOString().slice(0, 10);
 
             const saved = parseInt(localStorage.getItem('try_n3_progress_index'), 10);
-
             if (!isNaN(saved) && saved >= 0 && saved < totalQuestions) {
-
-                currentQuestionIndex = saved; // zero-based pointer
-
+                currentQuestionIndex = saved; // zero-based pointer (legacy)
             }
 
             const wrongRaw = localStorage.getItem('try_n3_wrong_indices');
-
             if (wrongRaw) {
-
                 const arr = JSON.parse(wrongRaw);
-
                 if (Array.isArray(arr)) wrongSet = new Set(arr);
-
             }
 
             const savedMode = localStorage.getItem('try_n3_mode');
-
             if (savedMode === 'wrong' || savedMode === 'all') {
-
                 mode = savedMode;
-
             }
 
             const savedWrongPtr = parseInt(localStorage.getItem('try_n3_wrong_ptr'), 10);
-
             if (!isNaN(savedWrongPtr)) wrongPointer = savedWrongPtr;
 
+            const savedDailyDate = localStorage.getItem('try_n3_daily_date') || today;
+            if (savedDailyDate === today) {
+                const savedDailyCount = parseInt(localStorage.getItem('try_n3_daily_count'), 10);
+                if (!isNaN(savedDailyCount) && savedDailyCount >= 0) dailyCount = savedDailyCount;
+            } else {
+                dailyCount = 0;
+            }
+            dailyDate = today;
+
+            const savedTotal = parseInt(localStorage.getItem('try_n3_total_done'), 10);
+            if (!isNaN(savedTotal) && savedTotal >= 0) totalCompleted = savedTotal;
+
+            const savedCursor = parseInt(localStorage.getItem('try_n3_rr_cursor'), 10);
+            if (!isNaN(savedCursor)) grammarCursor = savedCursor;
+
+            const savedNext = localStorage.getItem('try_n3_rr_next_map');
+            if (savedNext) {
+                const obj = JSON.parse(savedNext);
+                if (obj && typeof obj === 'object') grammarNextMap = obj;
+            }
+
+            const savedDone = localStorage.getItem('try_n3_rr_done');
+            if (savedDone) {
+                const arr = JSON.parse(savedDone);
+                if (Array.isArray(arr)) grammarDoneSet = new Set(arr);
+            }
         } catch (e) {
-
             console.warn('progress load failed', e);
-
         }
-
+        ensureRoundState();
+        // 若存在异常状态（全是已完成但总进度为 0），重置轮次指针
+        if (grammarDoneSet.size === groupedGrammar.length && totalCompleted === 0) {
+            grammarDoneSet.clear();
+            grammarCursor = 0;
+            grammarNextMap = {};
+        }
     }
 
+    
     function saveProgress() {
-
+        ensureTodayCounters();
         try {
-
             localStorage.setItem('try_n3_progress_index', String(currentQuestionIndex));
-
             localStorage.setItem('try_n3_wrong_indices', JSON.stringify(Array.from(wrongSet)));
-
             localStorage.setItem('try_n3_mode', mode);
-
             localStorage.setItem('try_n3_wrong_ptr', String(wrongPointer));
-
+            localStorage.setItem('try_n3_daily_date', dailyDate);
+            localStorage.setItem('try_n3_daily_count', String(dailyCount));
+            localStorage.setItem('try_n3_total_done', String(totalCompleted));
+            localStorage.setItem('try_n3_rr_cursor', String(grammarCursor));
+            localStorage.setItem('try_n3_rr_next_map', JSON.stringify(grammarNextMap));
+            localStorage.setItem('try_n3_rr_done', JSON.stringify(Array.from(grammarDoneSet)));
         } catch (e) {
-
             console.warn('progress save failed', e);
-
         }
+    }
 
+    
+        function ensureRoundState() {
+        groupedGrammar.forEach(g => {
+            if (grammarNextMap[g.grammar] == null || grammarNextMap[g.grammar] < 0) grammarNextMap[g.grammar] = 0;
+            if (grammarNextMap[g.grammar] >= g.items.length) {
+                grammarDoneSet.add(g.grammar);
+            } else {
+                grammarDoneSet.delete(g.grammar);
+            }
+        });
+        if (grammarCursor >= groupedGrammar.length) grammarCursor = 0;
     }
 
     function updateProgressUI() {
-
-        const done = Math.min(currentQuestionIndex, totalQuestions);
-
+        const done = Math.min(totalCompleted, totalQuestions);
         const pct = totalQuestions > 0 ? (done / totalQuestions) * 100 : 0;
-
         if (progressLabel) progressLabel.textContent = `${done}/${totalQuestions}`;
-
         if (progressBar) progressBar.style.width = `${pct}%`;
-
     }
 
     function updateModeUI() {
-
         if (wrongCountDisplay) wrongCountDisplay.textContent = wrongSet.size;
-
-        if (modeLabel) modeLabel.textContent = mode === 'wrong' ? '错题模式' : '全题模式';
-
+        if (modeLabel) modeLabel.textContent = mode === 'wrong' ? '错题模式' : '全部模式';
     }
 
     function getWrongList() {
 
         return Array.from(wrongSet);
+
+    }
+
+    function showToast(message, type = 'info') {
+
+        if (!toast) return;
+
+        toast.textContent = message;
+
+        toast.className = `toast ${type}`;
+
+        requestAnimationFrame(() => toast.classList.add('show'));
+
+        clearTimeout(toastTimer);
+
+        toastTimer = setTimeout(() => {
+
+            toast.classList.remove('show');
+
+        }, 1800);
+
+    }
+
+    function hideToast() {
+
+        if (!toast) return;
+
+        toast.classList.remove('show');
+
+        clearTimeout(toastTimer);
+
+    }
+
+    function queueAutoNext() {
+
+        if (!autoNextToggle || !autoNextToggle.checked) return;
+
+        clearTimeout(autoNextTimer);
+
+        autoNextTimer = setTimeout(() => {
+
+            generateQuestion();
+
+            showToast('已切换到下一题，继续加油！', 'info');
+
+        }, 1200);
+
+    }
+
+    function recordCompletion() {
+
+        ensureTodayCounters();
+
+        dailyCount += 1;
+
+        totalCompleted += 1;
+
+        saveProgress();
+
+        if (dailyCount % 10 === 0) {
+
+            showToast(`今日你已经完成第${dailyCount}题，累计已完成${totalCompleted}题，真的太棒了！`, 'info');
+
+        }
 
     }
 
@@ -5384,6 +5596,10 @@
 
     const allModeButton = document.getElementById('all-mode-button');
 
+    const autoNextToggle = document.getElementById('auto-next-toggle');
+
+    const toast = document.getElementById('toast');
+
     const resultArea = document.getElementById('result-area');
 
     const resultMessage = document.getElementById('result-message');
@@ -5452,7 +5668,7 @@
 
         let cleanedSentence = stripEndingPunctuation(sentence);
 
-        // �����ȡ� grammar �е��̶�片��ǰ�����
+        // 优先切开 grammar 中的固定片段，避免被分错
 
         const grammarFixedParts = getGrammarFixedParts(grammarPoint);
 
@@ -5796,251 +6012,270 @@
 
     // 生成新的题目
 
-    function generateQuestion(advance = true) {
+        
 
-        if (advance) {
+function generateQuestion(advance = true) {
 
-            currentQuestionIndex = (currentQuestionIndex + 1) % grammarData.length;
+        clearTimeout(autoNextTimer);
+        autoNextTimer = null;
+        hideToast();
 
+        if (mode === 'wrong') {
+            const wrongList = Array.from(wrongSet);
+            if (wrongList.length === 0) {
+                mode = 'all';
+                wrongPointer = 0;
+                updateModeUI();
+                saveProgress();
+                return generateQuestion(advance);
+            }
+            if (advance) {
+                wrongPointer = (wrongPointer + 1) % wrongList.length;
+            }
+            const safePtr = Math.min(wrongPointer, wrongList.length - 1);
+            currentQuestionIndex = wrongList[safePtr];
+            currentQuestion = grammarData[currentQuestionIndex];
+            currentGrammarKey = currentQuestion.grammar;
+        } else {
+            ensureRoundState();
+            if (grammarDoneSet.size === groupedGrammar.length) {
+                grammarDoneSet.clear();
+                grammarCursor = 0;
+                grammarNextMap = {};
+            }
+            const len = groupedGrammar.length;
+            let startCursor = grammarCursor;
+            if (advance) startCursor = (grammarCursor + 1) % len;
+            let found = null;
+            for (let i = 0; i < len; i++) {
+                const idx = (startCursor + i) % len;
+                const g = groupedGrammar[idx];
+                const nextIdx = grammarNextMap[g.grammar] || 0;
+                if (nextIdx < g.items.length) {
+                    found = { g, idx, nextIdx };
+                    break;
+                } else {
+                    grammarDoneSet.add(g.grammar);
+                }
+            }
+            if (!found) {
+                grammarDoneSet.clear();
+                grammarCursor = 0;
+                grammarNextMap = {};
+                saveProgress();
+                return generateQuestion(false);
+            }
+            grammarCursor = found.idx;
+            currentGrammarKey = found.g.grammar;
+            const pick = found.g.items[found.nextIdx];
+            currentQuestion = pick;
+            currentQuestionIndex = pick.index;
+            grammarNextMap[currentGrammarKey] = found.nextIdx + 1;
+            if (grammarNextMap[currentGrammarKey] >= found.g.items.length) {
+                grammarDoneSet.add(currentGrammarKey);
+            }
         }
 
         const dataIndex = currentQuestionIndex % grammarData.length;
-
         currentQuestion = grammarData[dataIndex];
-
         questionHistory.push(currentQuestion.sentence);
-
-        questionNumberDisplay.textContent = currentQuestionIndex + 1;
-
+        const nextNumber = Math.min(totalCompleted + 1, totalQuestions);
+        questionNumberDisplay.textContent = nextNumber;
         grammarDisplay.textContent = currentQuestion.grammar;
-
         if (translationHint) translationHint.textContent = currentQuestion.translation || '';
-
         updateProgressUI();
-
+        updateModeUI();
         saveProgress();
 
         hasChecked = false;
-
         isCurrentCorrect = false;
 
-        const correctOrder = segmentSentence(currentQuestion.sentence, currentQuestion.grammar);
-
+        let correctOrder = segmentSentence(currentQuestion.sentence, currentQuestion.grammar);
+        if (!correctOrder || correctOrder.length === 0) {
+            correctOrder = Array.from(stripEndingPunctuation(currentQuestion.sentence)).filter(ch => ch.trim() !== '');
+        }
         const shuffledOrder = shuffle([...correctOrder]);
-
         shuffledArea.innerHTML = '';
-
         answerArea.innerHTML = '';
-
         resultArea.style.display = 'none';
-
         resultArea.className = '';
-
         checkButton.style.display = 'inline-block';
 
         shuffledOrder.forEach((word, index) => {
-
             const chip = document.createElement('span');
-
             chip.className = 'word-chip';
-
             chip.textContent = word;
-
             chip.dataset.originalIndex = index;
-
             attachSpeechToChip(chip);
-
             chip.onclick = () => moveChip(chip, 'to-answer');
-
             shuffledArea.appendChild(chip);
-
         });
-
     }
 
-    // 移动词块
+    // 词块
 
+    // 拖拽移动词块
     function moveChip(chip, direction) {
-
         if (checkButton.style.display === 'none') return;
 
         if (direction === 'to-answer') {
-
             chip.className = 'answer-chip';
-
             enableAnswerDrag(chip);
-
             chip.onclick = () => moveChip(chip, 'to-shuffled');
-
             answerArea.appendChild(chip);
-
         } else {
-
             chip.className = 'word-chip';
-
             disableAnswerDrag(chip);
-
             chip.onclick = () => moveChip(chip, 'to-answer');
-
             shuffledArea.appendChild(chip);
-
         }
-
     }
 
     // 检查答案
-
     function checkAnswer() {
-
         if (answerArea.children.length === 0) {
-
-            alert('请先拼好句子再提交！');
-
+            alert('请先把词块拖到上面再提交哦');
             return;
-
         }
 
         const correctSentence = stripEndingPunctuation(currentQuestion.sentence).replace(/\s+/g, '');
-
         const userSentence = Array.from(answerArea.children)
-
             .map(chip => chip.textContent.trim())
-
             .join('')
-
             .replace(/\s+/g, '');
 
         resultArea.style.display = 'block';
-
         checkButton.style.display = 'none';
-
         correctJapanese.textContent = stripEndingPunctuation(currentQuestion.sentence);
-
         correctChinese.textContent = currentQuestion.translation;
 
         if (userSentence === correctSentence) {
-
-            resultMessage.textContent = '正确! 你的拼句全部正确';
-
+            resultMessage.textContent = '答对了，顺序完全正确';
             resultArea.className = 'correct';
-
             isCurrentCorrect = true;
 
+            const successMsg = (autoNextToggle && autoNextToggle.checked)
+                ? '正确！1.2 秒后自动进入下一题'
+                : '正确！可以点【下一题】手动前进';
+            showToast(successMsg, 'success');
+            queueAutoNext();
+
             if (wrongSet.has(currentQuestionIndex)) {
-
                 wrongSet.delete(currentQuestionIndex);
-
                 if (mode === 'wrong' && wrongSet.size === 0) {
-
-                    alert('错题本已清空，返回全题模式');
-
+                    alert('错题已清空，自动切回全部模式');
                     mode = 'all';
-
                     wrongPointer = 0;
-
                 }
-
-                saveProgress();
-
             }
 
+            recordCompletion();
         } else {
-
-            resultMessage.textContent = '错误! 看看正确答案吧。';
-
-            resultArea.className = '';
-
+            resultMessage.textContent = '还差一点点，再对照正确答案吧';
+            resultArea.className = 'incorrect';
             isCurrentCorrect = false;
+            showToast('答错啦，再调整一下顺序试试', 'error');
 
             if (!wrongSet.has(currentQuestionIndex)) {
-
                 wrongSet.add(currentQuestionIndex);
-
-                saveProgress();
-
             }
-
         }
 
+        saveProgress();
+        updateModeUI();
         hasChecked = true;
 
         Array.from(shuffledArea.children).forEach(chip => chip.onclick = null);
-
         Array.from(answerArea.children).forEach(chip => chip.onclick = null);
-
     }
 
     function resetSentence() {
-
-        // 重新洗牌当前题，不切换题号
-
         generateQuestion(false);
-
         resultArea.style.display = 'none';
-
         resultArea.className = '';
-
         checkButton.style.display = 'inline-block';
-
         hasChecked = false;
-
         isCurrentCorrect = false;
-
     }
 
     function resetProgress() {
-
         currentQuestionIndex = 0;
-
         questionHistory = [];
-
+        totalCompleted = 0;
+        dailyCount = 0;
+        wrongSet = new Set();
+        mode = 'all';
+        wrongPointer = 0;
+        grammarCursor = 0;
+        grammarNextMap = {};
+        grammarDoneSet = new Set();
+        currentGrammarKey = '';
         saveProgress();
-
         generateQuestion(false);
-
     }
 
-    // 事件监听器
-
+    // 事件绑定
     checkButton.addEventListener('click', checkAnswer);
 
     nextButton.addEventListener('click', () => {
+        clearTimeout(autoNextTimer);
+        autoNextTimer = null;
+        hideToast();
 
         if (!hasChecked) {
-
             alert('请先检查答案，再进入下一题');
-
             return;
-
         }
 
         if (!isCurrentCorrect) {
-
-            alert('本题尚未答对，请再尝试一次');
-
+            alert('本题还没答对，再调整一下');
             return;
-
         }
 
         generateQuestion();
+    });
 
+    wrongModeButton.addEventListener('click', () => {
+        if (wrongSet.size === 0) {
+            alert('暂无错题，先做几题再来哦');
+            return;
+        }
+        mode = 'wrong';
+        wrongPointer = 0;
+        saveProgress();
+        updateModeUI();
+        generateQuestion(false);
+    });
+
+    allModeButton.addEventListener('click', () => {
+        mode = 'all';
+        wrongPointer = currentQuestionIndex;
+        saveProgress();
+        updateModeUI();
+        generateQuestion(false);
     });
 
     resetButton.addEventListener('click', resetSentence);
-
-    progressResetButton.addEventListener('click', resetProgress);
+    progressResetButton.addEventListener('click', () => {
+        localStorage.removeItem('try_n3_rr_done');
+        localStorage.removeItem('try_n3_rr_next_map');
+        localStorage.removeItem('try_n3_rr_cursor');
+        localStorage.removeItem('try_n3_progress_index');
+        localStorage.removeItem('try_n3_wrong_indices');
+        localStorage.removeItem('try_n3_mode');
+        localStorage.removeItem('try_n3_wrong_ptr');
+        localStorage.removeItem('try_n3_daily_date');
+        localStorage.removeItem('try_n3_daily_count');
+        localStorage.removeItem('try_n3_total_done');
+        resetProgress();
+    });
 
     loadProgress();
-
     updateProgressUI();
+    updateModeUI();
 
-    // 首次加载
-
+    // 首题
     generateQuestion(false);
-
 </script>
-
 </body>
-
 </html>
-
